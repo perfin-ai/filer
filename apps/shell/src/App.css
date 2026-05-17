@@ -1,0 +1,115 @@
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  color: #1c1c1e;
+  background: #f7f7f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body,
+html,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.tab-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid #e3e3e6;
+  background: #fff;
+}
+
+.tab-bar nav {
+  display: flex;
+  gap: 4px;
+}
+
+.tab {
+  border: none;
+  background: transparent;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #5a5a60;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+  color: #1c1c1e;
+}
+
+.tab.active {
+  color: #0a84ff;
+  border-bottom-color: #0a84ff;
+}
+
+.backend-status {
+  font-size: 12px;
+  color: #8a8a8e;
+  font-variant-numeric: tabular-nums;
+}
+
+.backend-status.ready {
+  color: #34c759;
+}
+
+.backend-status.unreachable {
+  color: #ff3b30;
+}
+
+.content {
+  flex: 1;
+  overflow: auto;
+  padding: 24px 32px;
+}
+
+.panel {
+  max-width: 720px;
+}
+
+.panel h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.panel p {
+  color: #5a5a60;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #f2f2f7;
+    background: #1c1c1e;
+  }
+  .tab-bar {
+    background: #2c2c2e;
+    border-bottom-color: #3a3a3c;
+  }
+  .tab {
+    color: #aeaeb2;
+  }
+  .tab:hover {
+    color: #f2f2f7;
+  }
+  .tab.active {
+    color: #0a84ff;
+  }
+  .panel p {
+    color: #aeaeb2;
+  }
+}
