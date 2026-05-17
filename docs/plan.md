@@ -28,6 +28,7 @@ This plan derives from `assets/Tech Stack for Filer App.pdf`. It describes a Mac
 | Vector store | LanceDB (embedded, local path) |
 | Embeddings | `sentence-transformers` (e.g. `bge-small` or `nomic-embed-text`) |
 | Parsers | PyMuPDF / pypdf, python-docx, native text, pandas/openpyxl |
+| Python packaging | [`uv`](https://docs.astral.sh/uv/) — manages the venv, resolves/locks dependencies via `pyproject.toml` + `uv.lock`, and runs the sidecar (`uv run …`). Chosen over pip/poetry/pipenv for its speed, single-binary install, and deterministic lockfile. |
 | Later: local LLM | Ollama (optional) |
 | Later: cloud LLM | User-supplied API key (optional) |
 
