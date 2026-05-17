@@ -89,7 +89,13 @@ The shell launches the sidecar on a random localhost port and passes it to the U
 - `GET  /search?q=…` — hybrid keyword + vector search (used later by Assistant).
 - `GET  /health` — for the shell's readiness probe.
 
-Indexing runs in a background worker (asyncio task or a dedicated process). Progress is exposed both by polling and by an SSE stream `/index/jobs/{id}/events` so the UI can show live progress.
+Indexing runs as **Celery** tasks in a separate worker process launched alongside the FastAPI sidecar. Celery gives us durable job state, retries, cancellation, and a clean separation between the API (fast, request/response) and the long-running walk/extract/embed pipeline. Configuration:
+
+- **Broker**: Redis embedded as a sidecar binary, or — to avoid shipping Redis — Celery's filesystem/SQLite broker via `kombu` against the same `~/Library/Application Support/Filer/` data dir.
+- **Result backend**: SQLite (so job rows survive app restarts and are queryable from the API).
+- **Workers**: one worker process with a small concurrency (e.g. 2) so embedding doesn't starve the UI; tasks chained as `walk → extract → chunk → embed` so each stage is independently retryable.
+- **Progress**: tasks publish stage + counters via `update_state(meta=…)`; the API exposes them through `GET /index/jobs/{id}` and an SSE stream at `/index/jobs/{id}/events`.
+- **Cancellation**: `POST /index/jobs/{id}/cancel` revokes the Celery task; partial progress is preserved in SQLite so a re-run resumes via `content_hash`.
 
 ## 6. Indexing Pipeline
 
