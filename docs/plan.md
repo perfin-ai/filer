@@ -24,6 +24,8 @@ This plan derives from `assets/Tech Stack for Filer App.pdf`. It describes a Mac
 | UI | React + TypeScript (Vite) |
 | Backend sidecar | Python FastAPI on `127.0.0.1` |
 | Relational store | SQLite (file inventory, metadata, jobs, move history) |
+| Schema migrations | [Alembic](https://alembic.sqlalchemy.org/) — versioned, reversible migrations against `filer.db`; runs on sidecar startup so the local DB is always at the app's expected schema. Paired with SQLAlchemy 2.x models. |
+| Data validation & schemas | [Pydantic v2](https://docs.pydantic.dev/) — request/response models for the FastAPI endpoints in §5, plus internal DTOs for the indexing and filing pipelines. Single source of truth for JSON shapes shared with the React UI (export as TypeScript via `datamodel-code-generator`). |
 | Keyword search | SQLite FTS5 |
 | Vector store | LanceDB (embedded, local path) |
 | Embeddings | `sentence-transformers` (e.g. `bge-small` or `nomic-embed-text`) |
