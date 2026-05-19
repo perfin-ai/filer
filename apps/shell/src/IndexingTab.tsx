@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 
@@ -8,16 +8,37 @@ const BACKEND_URL =
 const IS_TAURI =
   typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
-type StartResult =
-  | { kind: "idle" }
-  | { kind: "starting" }
-  | { kind: "started"; jobId: string; rootPath: string }
-  | { kind: "error"; message: string };
+type JobStatus =
+  | "pending"
+  | "running"
+  | "success"
+  | "failure"
+  | "cancelled";
+
+type JobState = {
+  job_id: string;
+  root_path: string;
+  status: JobStatus;
+  stage: string | null;
+  files_seen: number;
+  files_indexed: number;
+  files_skipped: number;
+  error: string | null;
+};
+
+const TERMINAL: ReadonlySet<JobStatus> = new Set([
+  "success",
+  "failure",
+  "cancelled",
+]);
 
 export function IndexingTab() {
   const [folder, setFolder] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
-  const [result, setResult] = useState<StartResult>({ kind: "idle" });
+  const [job, setJob] = useState<JobState | null>(null);
+  const [startError, setStartError] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
+  const esRef = useRef<EventSource | null>(null);
 
   useEffect(() => {
     if (!IS_TAURI) return;
@@ -35,7 +56,8 @@ export function IndexingTab() {
           const first = p.paths?.[0];
           if (first) {
             setFolder(first);
-            setResult({ kind: "idle" });
+            setJob(null);
+            setStartError(null);
           }
         }
       })
@@ -49,18 +71,49 @@ export function IndexingTab() {
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      esRef.current?.close();
+      esRef.current = null;
+    };
+  }, []);
+
   const choose = useCallback(async () => {
     if (!IS_TAURI) return;
     const selected = await open({ directory: true, multiple: false });
     if (typeof selected === "string") {
       setFolder(selected);
-      setResult({ kind: "idle" });
+      setJob(null);
+      setStartError(null);
     }
+  }, []);
+
+  const subscribe = useCallback((jobId: string) => {
+    esRef.current?.close();
+    const es = new EventSource(`${BACKEND_URL}/index/jobs/${jobId}/events`);
+    esRef.current = es;
+    es.addEventListener("progress", (ev) => {
+      try {
+        const data = JSON.parse((ev as MessageEvent).data) as JobState;
+        setJob(data);
+        if (TERMINAL.has(data.status)) {
+          es.close();
+          esRef.current = null;
+        }
+      } catch {
+        // ignore parse errors
+      }
+    });
+    es.onerror = () => {
+      // Browser closes the connection on terminal status; nothing to do.
+    };
   }, []);
 
   const start = useCallback(async () => {
     if (!folder) return;
-    setResult({ kind: "starting" });
+    setStarting(true);
+    setStartError(null);
+    setJob(null);
     try {
       const res = await fetch(`${BACKEND_URL}/index/start`, {
         method: "POST",
@@ -75,23 +128,25 @@ export function IndexingTab() {
         } catch {
           /* ignore */
         }
-        setResult({ kind: "error", message });
+        setStartError(message);
         return;
       }
-      const data = await res.json();
-      setResult({
-        kind: "started",
-        jobId: data.job_id,
-        rootPath: data.root_path,
-      });
+      const data = (await res.json()) as JobState;
+      setJob(data);
+      subscribe(data.job_id);
     } catch (err) {
-      setResult({ kind: "error", message: String(err) });
+      setStartError(String(err));
+    } finally {
+      setStarting(false);
     }
-  }, [folder]);
+  }, [folder, subscribe]);
+
+  const inProgress = job && !TERMINAL.has(job.status);
 
   return (
     <section className="panel indexing">
       <h2>Indexing</h2>
+
       <div
         className={`drop-zone${dragging ? " dragging" : ""}${folder ? " has-folder" : ""}`}
         onClick={choose}
@@ -110,7 +165,9 @@ export function IndexingTab() {
           <>
             <div className="drop-headline">Drop a folder here</div>
             <div className="hint">
-              {IS_TAURI ? "or click to choose" : "Folder picker requires the desktop app"}
+              {IS_TAURI
+                ? "or click to choose"
+                : "Folder picker requires the desktop app"}
             </div>
           </>
         )}
@@ -119,21 +176,41 @@ export function IndexingTab() {
       <div className="actions">
         <button
           className="primary"
-          disabled={!folder || result.kind === "starting"}
+          disabled={!folder || starting || !!inProgress}
           onClick={start}
         >
-          {result.kind === "starting" ? "Starting…" : "Start indexing"}
+          {starting || inProgress ? "Indexing…" : "Start indexing"}
         </button>
       </div>
 
-      {result.kind === "started" && (
-        <p className="status ok">
-          Started job <code>{result.jobId}</code> for <code>{result.rootPath}</code>
-        </p>
-      )}
-      {result.kind === "error" && (
-        <p className="status err">Failed to start: {result.message}</p>
+      {startError && <p className="status err">Failed to start: {startError}</p>}
+
+      {job && (
+        <div className="job-card">
+          <div className="job-header">
+            <span className={`job-status ${job.status}`}>{job.status}</span>
+            {job.stage && <span className="job-stage">{job.stage}</span>}
+            <code className="job-id">{job.job_id.slice(0, 8)}</code>
+          </div>
+          <div className="job-counters">
+            <Counter label="seen" value={job.files_seen} />
+            <Counter label="indexed" value={job.files_indexed} />
+            <Counter label="skipped" value={job.files_skipped} />
+          </div>
+          {job.status === "failure" && job.error && (
+            <p className="status err">Error: {job.error}</p>
+          )}
+        </div>
       )}
     </section>
+  );
+}
+
+function Counter({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="counter">
+      <div className="counter-value">{value.toLocaleString()}</div>
+      <div className="counter-label">{label}</div>
+    </div>
   );
 }

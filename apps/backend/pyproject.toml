@@ -7,6 +7,11 @@ dependencies = [
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
     "pydantic>=2.9",
+    "sqlalchemy>=2.0",
+    "alembic>=1.13",
+    "celery>=5.4",
+    "sse-starlette>=2.1",
+    "platformdirs>=4.3",
 ]
 
 [build-system]

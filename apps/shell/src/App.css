@@ -179,6 +179,83 @@ button.primary:disabled {
   color: #ff3b30;
 }
 
+.job-card {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid #e3e3e6;
+  border-radius: 10px;
+}
+
+.job-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.job-status {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e3e3e6;
+  color: #1c1c1e;
+}
+
+.job-status.pending {
+  background: #e3e3e6;
+  color: #5a5a60;
+}
+
+.job-status.running {
+  background: rgba(10, 132, 255, 0.15);
+  color: #0a84ff;
+}
+
+.job-status.success {
+  background: rgba(52, 199, 89, 0.15);
+  color: #1f9d4d;
+}
+
+.job-status.failure {
+  background: rgba(255, 59, 48, 0.15);
+  color: #c0392b;
+}
+
+.job-stage {
+  font-size: 12px;
+  color: #5a5a60;
+  font-variant: all-small-caps;
+}
+
+.job-id {
+  margin-left: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: #8a8a8e;
+}
+
+.job-counters {
+  display: flex;
+  gap: 18px;
+}
+
+.counter-value {
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.counter-label {
+  font-size: 11px;
+  color: #8a8a8e;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 @media (prefers-color-scheme: dark) {
   .drop-zone {
     background: #2c2c2e;
@@ -195,6 +272,14 @@ button.primary:disabled {
   }
   .status code {
     background: rgba(255, 255, 255, 0.08);
+  }
+  .job-card {
+    background: #2c2c2e;
+    border-color: #3a3a3c;
+  }
+  .job-status.pending {
+    background: rgba(255, 255, 255, 0.08);
+    color: #aeaeb2;
   }
 }
 
