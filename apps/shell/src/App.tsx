@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { IndexingTab } from "./IndexingTab";
 import "./App.css";
 
 type Tab = "indexing" | "filing";
@@ -57,15 +58,6 @@ export default function App() {
         {tab === "filing" && <FilingTab />}
       </main>
     </div>
-  );
-}
-
-function IndexingTab() {
-  return (
-    <section className="panel">
-      <h2>Indexing</h2>
-      <p>Drop a root folder or choose one to begin indexing. (Coming soon.)</p>
-    </section>
   );
 }
 

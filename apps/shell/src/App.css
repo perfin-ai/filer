@@ -91,6 +91,113 @@ html,
   margin: 0;
 }
 
+.drop-zone {
+  margin-top: 16px;
+  border: 2px dashed #c7c7cc;
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.drop-zone:hover {
+  border-color: #0a84ff;
+}
+
+.drop-zone.dragging {
+  border-color: #0a84ff;
+  background: rgba(10, 132, 255, 0.08);
+}
+
+.drop-zone.has-folder {
+  text-align: left;
+}
+
+.drop-headline {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1c1c1e;
+  margin-bottom: 4px;
+}
+
+.folder-path {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  color: #1c1c1e;
+  word-break: break-all;
+  margin-bottom: 4px;
+}
+
+.hint {
+  font-size: 12px;
+  color: #8a8a8e;
+}
+
+.actions {
+  margin-top: 16px;
+}
+
+button.primary {
+  background: #0a84ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button.primary:hover:not(:disabled) {
+  background: #0066d6;
+}
+
+button.primary:disabled {
+  background: #c7c7cc;
+  cursor: not-allowed;
+}
+
+.status {
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.status code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.status.ok {
+  color: #1c1c1e;
+}
+
+.status.err {
+  color: #ff3b30;
+}
+
+@media (prefers-color-scheme: dark) {
+  .drop-zone {
+    background: #2c2c2e;
+    border-color: #3a3a3c;
+  }
+  .drop-zone:hover,
+  .drop-zone.dragging {
+    border-color: #0a84ff;
+  }
+  .drop-headline,
+  .folder-path,
+  .status.ok {
+    color: #f2f2f7;
+  }
+  .status code {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     color: #f2f2f7;
