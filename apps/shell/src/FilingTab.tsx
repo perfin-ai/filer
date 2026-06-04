@@ -330,7 +330,7 @@ export function FilingTab() {
           if (e.key === "Enter" || e.key === " ") choose();
         }}
       >
-        <div className="drop-headline">Drop files or a folder here</div>
+        <div className="drop-headline">Drop a folder or files here</div>
         <div className="hint">
           {IS_TAURI ? "or click to choose" : "Drag & drop requires the desktop app"}
         </div>
@@ -360,7 +360,7 @@ export function FilingTab() {
                 <li
                   key={f.file_id}
                   className={`file-row${f.file_id === selectedId ? " selected" : ""}`}
-                  title="Click to select · drag onto a folder to file here"
+                  title="Click to select · drag onto a folder to file this"
                   onPointerDown={(e) => startFileDrag(e, f)}
                   onClick={() => {
                     if (didDragRef.current) {
@@ -407,7 +407,7 @@ export function FilingTab() {
                       s.folder_path === revealedPath ? " active" : ""
                     }`}
                     key={s.suggestion_id}
-                    title="Click to locate · drag onto a folder to file here"
+                    title="Click to select · drag onto a folder to file this"
                     onPointerDown={(e) => startFileDrag(e, selectedFile)}
                     onClick={() => {
                       if (didDragRef.current) {
@@ -420,7 +420,9 @@ export function FilingTab() {
                     <FolderIcon />
                     <div className="sug-info">
                       <div className="sug-folder">{s.folder_name}</div>
-                      <div className="sug-path">{s.folder_path}</div>
+                      <div className="sug-path" title={s.folder_path}>
+                        {s.folder_path}
+                      </div>
                       <div className="sug-confidence">
                         <span className="conf-track">
                           <span
