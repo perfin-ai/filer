@@ -2692,8 +2692,8 @@
       "y": 720,
       "name": "Filer — Filing · Dark",
       "clip": true,
-      "width": 900,
-      "height": 790,
+      "width": 1100,
+      "height": 770,
       "fill": "#1c1c1e",
       "layout": "vertical",
       "children": [
@@ -3486,6 +3486,7 @@
                                   "id": "To292",
                                   "name": "Sug Invoices",
                                   "width": "fill_container",
+                                  "fill": "#0a84ff1f",
                                   "stroke": "#3a3a3c",
                                   "strokeWidth": {
                                     "bottom": 1
@@ -3523,7 +3524,7 @@
                                           "fill": "#f2f2f7",
                                           "textGrowth": "fixed-width",
                                           "width": "fill_container",
-                                          "content": "Invoices",
+                                          "content": "Documents",
                                           "fontFamily": "Inter",
                                           "fontSize": 13,
                                           "fontWeight": "500"
@@ -3535,7 +3536,7 @@
                                           "fill": "#8a8a8e",
                                           "textGrowth": "fixed-width",
                                           "width": "fill_container",
-                                          "content": "Documents / Finance / Invoices",
+                                          "content": "/Volumes/home/_Documents/…/Fidelity/Visa 6665/Documents",
                                           "fontFamily": "Inter",
                                           "fontSize": 11,
                                           "fontWeight": "normal"
@@ -3649,7 +3650,7 @@
                                           "fill": "#f2f2f7",
                                           "textGrowth": "fixed-width",
                                           "width": "fill_container",
-                                          "content": "2026",
+                                          "content": "MightyOak",
                                           "fontFamily": "Inter",
                                           "fontSize": 13,
                                           "fontWeight": "500"
@@ -3661,7 +3662,7 @@
                                           "fill": "#8a8a8e",
                                           "textGrowth": "fixed-width",
                                           "width": "fill_container",
-                                          "content": "Documents / Finance / 2026",
+                                          "content": "/Volumes/MightyOak",
                                           "fontFamily": "Inter",
                                           "fontSize": 11,
                                           "fontWeight": "normal"
@@ -3688,7 +3689,7 @@
                                                   "id": "PbCUw",
                                                   "name": "Bar Fill",
                                                   "fill": "#0a84ff",
-                                                  "width": 89,
+                                                  "width": 78,
                                                   "height": "fill_container"
                                                 }
                                               ]
@@ -3698,7 +3699,7 @@
                                               "id": "ipt7d",
                                               "name": "Pct",
                                               "fill": "#aeaeb2",
-                                              "content": "81% match",
+                                              "content": "71% match",
                                               "fontFamily": "Inter",
                                               "fontSize": 11,
                                               "fontWeight": "normal"
@@ -3775,7 +3776,7 @@
                                           "fill": "#f2f2f7",
                                           "textGrowth": "fixed-width",
                                           "width": "fill_container",
-                                          "content": "Receipts",
+                                          "content": "homes",
                                           "fontFamily": "Inter",
                                           "fontSize": 13,
                                           "fontWeight": "500"
@@ -3787,7 +3788,7 @@
                                           "fill": "#8a8a8e",
                                           "textGrowth": "fixed-width",
                                           "width": "fill_container",
-                                          "content": "Documents / Receipts",
+                                          "content": "/Volumes/homes",
                                           "fontFamily": "Inter",
                                           "fontSize": 11,
                                           "fontWeight": "normal"
@@ -3814,7 +3815,7 @@
                                                   "id": "B5eZF",
                                                   "name": "Bar Fill",
                                                   "fill": "#ff9f0a",
-                                                  "width": 68,
+                                                  "width": 64,
                                                   "height": "fill_container"
                                                 }
                                               ]
@@ -3824,7 +3825,7 @@
                                               "id": "vV01Q",
                                               "name": "Pct",
                                               "fill": "#aeaeb2",
-                                              "content": "62% match",
+                                              "content": "58% match",
                                               "fontFamily": "Inter",
                                               "fontSize": 11,
                                               "fontWeight": "normal"
@@ -3873,7 +3874,7 @@
                       "id": "G5Sf7j",
                       "name": "Library Pane",
                       "clip": true,
-                      "width": 300,
+                      "width": 400,
                       "height": "fill_container",
                       "fill": "#2c2c2e",
                       "cornerRadius": 10,
@@ -3915,7 +3916,7 @@
                               "id": "HhZk4",
                               "name": "Meta",
                               "fill": "#8a8a8e",
-                              "content": "~/Documents",
+                              "content": "/Volumes",
                               "fontFamily": "Inter",
                               "fontSize": 11,
                               "fontWeight": "normal"
@@ -3929,12 +3930,13 @@
                           "clip": true,
                           "width": "fill_container",
                           "height": "fill_container",
+                          "fill": "#2c2c2e",
                           "layout": "vertical",
                           "children": [
                             {
                               "type": "frame",
-                              "id": "Kx4C9",
-                              "name": "Node Documents",
+                              "id": "IWQvw",
+                              "name": "Node home",
                               "width": "fill_container",
                               "fill": "#00000000",
                               "gap": 8,
@@ -3946,7 +3948,17 @@
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "bwCTu",
+                                  "id": "uUCaM",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "Uma1r",
                                   "name": "Folder",
                                   "width": 15,
                                   "height": 15,
@@ -3956,12 +3968,12 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "WYnNq",
+                                  "id": "e3H9m",
                                   "name": "Name",
                                   "fill": "#aeaeb2",
                                   "textGrowth": "fixed-width",
                                   "width": "fill_container",
-                                  "content": "Documents",
+                                  "content": "home",
                                   "fontFamily": "Inter",
                                   "fontSize": 13,
                                   "fontWeight": "normal"
@@ -3970,8 +3982,8 @@
                             },
                             {
                               "type": "frame",
-                              "id": "plAmR",
-                              "name": "Node Finance",
+                              "id": "X7HSn",
+                              "name": "Node _Documents",
                               "width": "fill_container",
                               "fill": "#00000000",
                               "gap": 8,
@@ -3985,7 +3997,17 @@
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "Ofmnx",
+                                  "id": "D9NXcN",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "naGH7",
                                   "name": "Folder",
                                   "width": 15,
                                   "height": 15,
@@ -3995,12 +4017,12 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "qfXOo",
+                                  "id": "m4jOUI",
                                   "name": "Name",
                                   "fill": "#aeaeb2",
                                   "textGrowth": "fixed-width",
                                   "width": "fill_container",
-                                  "content": "Finance",
+                                  "content": "_Documents",
                                   "fontFamily": "Inter",
                                   "fontSize": 13,
                                   "fontWeight": "normal"
@@ -4009,10 +4031,10 @@
                             },
                             {
                               "type": "frame",
-                              "id": "X4ji05",
-                              "name": "Node Invoices",
+                              "id": "gGtK2",
+                              "name": "Node _Records",
                               "width": "fill_container",
-                              "fill": "#0a84ff1f",
+                              "fill": "#00000000",
                               "gap": 8,
                               "padding": [
                                 7,
@@ -4024,7 +4046,360 @@
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "xjyFL",
+                                  "id": "oPdao",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "V160Fm",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "cbZip",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "_Records",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "TNqZZ",
+                              "name": "Node _By Year",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                66
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "cpCUk",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "YImQR",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "CW05y",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "_By Year",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "Cu2Xq",
+                              "name": "Node _2026",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                84
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "X1AzTX",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "SB2aJ",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "e6vboD",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "_2026",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "en3eQ",
+                              "name": "Node Banking",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                102
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "G7NsdD",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "g2Ci5",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "X3bdco",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Banking",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "ZIEUX",
+                              "name": "Node Credit",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                120
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "S7XdW0",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "t64le",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "NvocQ",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Credit",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "e4jtI",
+                              "name": "Node Fidelity",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                138
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "xYg3X",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "jZd9G",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "F1tsV",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Fidelity",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "IekbU",
+                              "name": "Node Visa 6665",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                156
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "zWIC4",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "t7NWH",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "CJKpy",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Visa 6665",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "p8JNS",
+                              "name": "Node Documents",
+                              "width": "fill_container",
+                              "fill": "#0a84ff1f",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                174
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "d2WKTz",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-right",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "CfAR4",
                                   "name": "Folder",
                                   "width": 15,
                                   "height": 15,
@@ -4034,19 +4409,19 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "OnDme",
+                                  "id": "Xiksc",
                                   "name": "Name",
                                   "fill": "#0a84ff",
                                   "textGrowth": "fixed-width",
                                   "width": "fill_container",
-                                  "content": "Invoices",
+                                  "content": "Documents",
                                   "fontFamily": "Inter",
                                   "fontSize": 13,
                                   "fontWeight": "normal"
                                 },
                                 {
                                   "type": "icon",
-                                  "id": "j2MNy",
+                                  "id": "p6dP7",
                                   "name": "Target",
                                   "width": 13,
                                   "height": 13,
@@ -4058,8 +4433,8 @@
                             },
                             {
                               "type": "frame",
-                              "id": "yQ12I",
-                              "name": "Node 2026",
+                              "id": "YADAB",
+                              "name": "Node Letters",
                               "width": "fill_container",
                               "fill": "#00000000",
                               "gap": 8,
@@ -4067,13 +4442,23 @@
                                 7,
                                 12,
                                 7,
-                                48
+                                174
                               ],
                               "alignItems": "center",
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "g2Q0hQ",
+                                  "id": "dJzXt",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-right",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "GLc8T",
                                   "name": "Folder",
                                   "width": 15,
                                   "height": 15,
@@ -4083,12 +4468,12 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "L0jXHQ",
+                                  "id": "X00K2G",
                                   "name": "Name",
                                   "fill": "#aeaeb2",
                                   "textGrowth": "fixed-width",
                                   "width": "fill_container",
-                                  "content": "2026",
+                                  "content": "Letters",
                                   "fontFamily": "Inter",
                                   "fontSize": 13,
                                   "fontWeight": "normal"
@@ -4097,86 +4482,8 @@
                             },
                             {
                               "type": "frame",
-                              "id": "udNTl",
-                              "name": "Node Receipts",
-                              "width": "fill_container",
-                              "fill": "#00000000",
-                              "gap": 8,
-                              "padding": [
-                                7,
-                                12,
-                                7,
-                                30
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "uZrHT",
-                                  "name": "Folder",
-                                  "width": 15,
-                                  "height": 15,
-                                  "icon": "folder",
-                                  "library": "lucide",
-                                  "fill": "#8a8a8e"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "lBRxh",
-                                  "name": "Name",
-                                  "fill": "#aeaeb2",
-                                  "textGrowth": "fixed-width",
-                                  "width": "fill_container",
-                                  "content": "Receipts",
-                                  "fontFamily": "Inter",
-                                  "fontSize": 13,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "PP78L",
-                              "name": "Node Personal",
-                              "width": "fill_container",
-                              "fill": "#00000000",
-                              "gap": 8,
-                              "padding": [
-                                7,
-                                12,
-                                7,
-                                30
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "C5SOa",
-                                  "name": "Folder",
-                                  "width": 15,
-                                  "height": 15,
-                                  "icon": "folder",
-                                  "library": "lucide",
-                                  "fill": "#8a8a8e"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "PuwlI",
-                                  "name": "Name",
-                                  "fill": "#aeaeb2",
-                                  "textGrowth": "fixed-width",
-                                  "width": "fill_container",
-                                  "content": "Personal",
-                                  "fontFamily": "Inter",
-                                  "fontSize": 13,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "r0qIFq",
-                              "name": "Node Media",
+                              "id": "rzRXr",
+                              "name": "Node homes",
                               "width": "fill_container",
                               "fill": "#00000000",
                               "gap": 8,
@@ -4188,46 +4495,17 @@
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "v5IuT",
-                                  "name": "Folder",
-                                  "width": 15,
-                                  "height": 15,
-                                  "icon": "folder",
+                                  "id": "nHVoI",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-right",
                                   "library": "lucide",
                                   "fill": "#8a8a8e"
                                 },
-                                {
-                                  "type": "text",
-                                  "id": "MAL1W",
-                                  "name": "Name",
-                                  "fill": "#aeaeb2",
-                                  "textGrowth": "fixed-width",
-                                  "width": "fill_container",
-                                  "content": "Media",
-                                  "fontFamily": "Inter",
-                                  "fontSize": 13,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "w2d6AR",
-                              "name": "Node Photos",
-                              "width": "fill_container",
-                              "fill": "#00000000",
-                              "gap": 8,
-                              "padding": [
-                                7,
-                                12,
-                                7,
-                                30
-                              ],
-                              "alignItems": "center",
-                              "children": [
                                 {
                                   "type": "icon",
-                                  "id": "eOjfk",
+                                  "id": "BX1nj",
                                   "name": "Folder",
                                   "width": 15,
                                   "height": 15,
@@ -4237,12 +4515,12 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "jQWmO",
+                                  "id": "eRCyj",
                                   "name": "Name",
                                   "fill": "#aeaeb2",
                                   "textGrowth": "fixed-width",
                                   "width": "fill_container",
-                                  "content": "Photos",
+                                  "content": "homes",
                                   "fontFamily": "Inter",
                                   "fontSize": 13,
                                   "fontWeight": "normal"
@@ -4251,47 +4529,8 @@
                             },
                             {
                               "type": "frame",
-                              "id": "Y8875",
-                              "name": "Node Videos",
-                              "width": "fill_container",
-                              "fill": "#00000000",
-                              "gap": 8,
-                              "padding": [
-                                7,
-                                12,
-                                7,
-                                30
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "rFMju",
-                                  "name": "Folder",
-                                  "width": 15,
-                                  "height": 15,
-                                  "icon": "folder",
-                                  "library": "lucide",
-                                  "fill": "#8a8a8e"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "KcSDM",
-                                  "name": "Name",
-                                  "fill": "#aeaeb2",
-                                  "textGrowth": "fixed-width",
-                                  "width": "fill_container",
-                                  "content": "Videos",
-                                  "fontFamily": "Inter",
-                                  "fontSize": 13,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "e5Wbkx",
-                              "name": "Node Projects",
+                              "id": "fnYqi",
+                              "name": "Node Joplin 3.6.14-arm64",
                               "width": "fill_container",
                               "fill": "#00000000",
                               "gap": 8,
@@ -4303,7 +4542,17 @@
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "qpbM6",
+                                  "id": "c51To",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-right",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "De0ZE",
                                   "name": "Folder",
                                   "width": 15,
                                   "height": 15,
@@ -4313,12 +4562,12 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "O2peLD",
+                                  "id": "Y4rlp4",
                                   "name": "Name",
                                   "fill": "#aeaeb2",
                                   "textGrowth": "fixed-width",
                                   "width": "fill_container",
-                                  "content": "Projects",
+                                  "content": "Joplin 3.6.14-arm64",
                                   "fontFamily": "Inter",
                                   "fontSize": 13,
                                   "fontWeight": "normal"
@@ -4327,8 +4576,8 @@
                             },
                             {
                               "type": "frame",
-                              "id": "f5SIC",
-                              "name": "Node Archive",
+                              "id": "ys3nH",
+                              "name": "Node MightyOak",
                               "width": "fill_container",
                               "fill": "#00000000",
                               "gap": 8,
@@ -4340,7 +4589,17 @@
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "K10i7n",
+                                  "id": "XaX1R",
+                                  "name": "Chevron",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "chevron-right",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "XDYuk",
                                   "name": "Folder",
                                   "width": 15,
                                   "height": 15,
@@ -4350,12 +4609,12 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "LSdXs",
+                                  "id": "pwUhs",
                                   "name": "Name",
                                   "fill": "#aeaeb2",
                                   "textGrowth": "fixed-width",
                                   "width": "fill_container",
-                                  "content": "Archive",
+                                  "content": "MightyOak",
                                   "fontFamily": "Inter",
                                   "fontSize": 13,
                                   "fontWeight": "normal"
