@@ -2693,7 +2693,7 @@
       "name": "Filer — Filing · Dark",
       "clip": true,
       "width": 900,
-      "height": 640,
+      "height": 790,
       "fill": "#1c1c1e",
       "layout": "vertical",
       "children": [
@@ -2801,7 +2801,7 @@
               "type": "frame",
               "id": "gwKk1",
               "name": "Panel",
-              "width": 720,
+              "width": "fill_container",
               "layout": "vertical",
               "gap": 16,
               "children": [
@@ -2816,41 +2816,51 @@
                   "fontWeight": "600"
                 },
                 {
+                  "type": "text",
+                  "id": "H7WKL",
+                  "name": "Filing Subtitle",
+                  "fill": "#aeaeb2",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Drop an unorganized folder or loose files — Filer processes each one and suggests where it belongs.",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
                   "type": "frame",
-                  "id": "pbxEk",
-                  "x": 0,
-                  "y": 40,
-                  "name": "Drop Zone",
-                  "enabled": false,
-                  "width": "fill_container(720)",
-                  "fill": "#ffffff",
+                  "id": "N0PM6Y",
+                  "name": "Filing Drop Zone",
+                  "width": "fill_container",
+                  "fill": "#2c2c2e",
                   "cornerRadius": 12,
-                  "stroke": "#c7c7cc",
+                  "stroke": "#3a3a3c",
                   "strokeWidth": 2,
                   "strokeAlignment": "inner",
                   "layout": "vertical",
                   "gap": 4,
                   "padding": [
-                    20,
+                    22,
                     24
                   ],
+                  "alignItems": "center",
                   "children": [
                     {
                       "type": "text",
-                      "id": "lCWVz",
-                      "name": "Folder Path",
-                      "fill": "#1c1c1e",
-                      "content": "/Users/ericmelz/Data/code/filer/apps",
-                      "fontFamily": "JetBrains Mono",
-                      "fontSize": 13,
-                      "fontWeight": "normal"
+                      "id": "WVXfc",
+                      "name": "Drop Headline",
+                      "fill": "#f2f2f7",
+                      "content": "Drop files or a folder here",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "500"
                     },
                     {
                       "type": "text",
-                      "id": "Arukp",
-                      "name": "Hint",
+                      "id": "r627E",
+                      "name": "Drop Hint",
                       "fill": "#8a8a8e",
-                      "content": "Click to choose a different folder",
+                      "content": "or click to choose",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "normal"
@@ -2859,116 +2869,1000 @@
                 },
                 {
                   "type": "frame",
-                  "id": "V2qOmd",
-                  "x": 0,
-                  "y": 132,
-                  "name": "Actions",
-                  "enabled": false,
-                  "width": "fill_container(720)",
+                  "id": "w4LgXi",
+                  "name": "Processing Status",
+                  "width": "fill_container",
+                  "gap": 8,
+                  "alignItems": "center",
                   "children": [
                     {
-                      "type": "frame",
-                      "id": "G8uFML",
-                      "name": "Primary Button",
-                      "fill": "#c7c7cc",
-                      "cornerRadius": 8,
-                      "padding": [
-                        8,
-                        16
-                      ],
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "g1KLi",
-                          "name": "Label",
-                          "fill": "#ffffff",
-                          "content": "Indexing…",
-                          "fontFamily": "Inter",
-                          "fontSize": 13,
-                          "fontWeight": "500"
-                        }
-                      ]
+                      "type": "icon",
+                      "id": "nJgjz",
+                      "name": "Status Spinner",
+                      "width": 14,
+                      "height": 14,
+                      "icon": "loader-circle",
+                      "library": "lucide",
+                      "fill": "#0a84ff"
+                    },
+                    {
+                      "type": "text",
+                      "id": "atSpL",
+                      "name": "Status Text",
+                      "fill": "#aeaeb2",
+                      "content": "Processing 4 of 12 files…",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
                 {
                   "type": "frame",
-                  "id": "j90NW",
-                  "x": 0,
-                  "y": 180,
-                  "name": "Job Card",
-                  "enabled": false,
-                  "width": "fill_container(720)",
-                  "fill": "#ffffff",
-                  "cornerRadius": 10,
-                  "stroke": "#e3e3e6",
-                  "strokeWidth": 1,
-                  "strokeAlignment": "inner",
-                  "layout": "vertical",
-                  "gap": 10,
-                  "padding": [
-                    12,
-                    14
-                  ],
+                  "id": "KTcVn",
+                  "name": "Work Area",
+                  "width": "fill_container",
+                  "height": 430,
+                  "gap": 16,
                   "children": [
                     {
                       "type": "frame",
-                      "id": "DKJMH",
-                      "name": "Job Header",
+                      "id": "zUjEH",
+                      "name": "Left Column",
                       "width": "fill_container",
-                      "gap": 10,
-                      "alignItems": "center",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 12,
                       "children": [
                         {
                           "type": "frame",
-                          "id": "B37eKp",
-                          "name": "Status Badge",
-                          "fill": "#1d6fd11a",
-                          "cornerRadius": 999,
-                          "padding": [
-                            2,
-                            8
-                          ],
+                          "id": "aHHWp",
+                          "name": "File Pane",
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": 150,
+                          "fill": "#2c2c2e",
+                          "cornerRadius": 10,
+                          "stroke": "#3a3a3c",
+                          "strokeWidth": 1,
+                          "strokeAlignment": "inner",
+                          "layout": "vertical",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "oZubt",
-                              "name": "Status",
-                              "fill": "#0a84ff",
-                              "content": "RUNNING",
-                              "fontFamily": "Inter",
-                              "fontSize": 12,
-                              "fontWeight": "600",
-                              "letterSpacing": 0.5
+                              "type": "frame",
+                              "id": "N6rqc",
+                              "name": "Pane Header",
+                              "width": "fill_container",
+                              "stroke": "#3a3a3c",
+                              "strokeWidth": {
+                                "bottom": 1
+                              },
+                              "strokeAlignment": "inner",
+                              "padding": [
+                                9,
+                                12
+                              ],
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "B7Te6N",
+                                  "name": "Title",
+                                  "fill": "#aeaeb2",
+                                  "content": "Files",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "600",
+                                  "letterSpacing": 0.3
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "P6daq",
+                                  "name": "Meta",
+                                  "fill": "#8a8a8e",
+                                  "content": "12 processed",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "e723S9",
+                              "name": "File List",
+                              "clip": true,
+                              "width": "fill_container",
+                              "height": "fill_container",
+                              "layout": "vertical",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "wNg55",
+                                  "name": "File invoice_q1_2026.pdf",
+                                  "width": "fill_container",
+                                  "fill": "#0a84ff1f",
+                                  "stroke": "#0a84ff",
+                                  "strokeWidth": {
+                                    "bottom": 1,
+                                    "left": 2
+                                  },
+                                  "strokeAlignment": "inner",
+                                  "gap": 9,
+                                  "padding": [
+                                    8,
+                                    12
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "ARxnI",
+                                      "name": "Icon",
+                                      "width": 15,
+                                      "height": 15,
+                                      "icon": "file-text",
+                                      "library": "lucide",
+                                      "fill": "#0a84ff"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "ULG77",
+                                      "name": "Name Wrap",
+                                      "width": "fill_container",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "FzDHS",
+                                          "name": "Name",
+                                          "fill": "#f2f2f7",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "invoice_q1_2026.pdf",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 13,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "gD7CR",
+                                      "name": "St",
+                                      "fill": "#34c759",
+                                      "content": "ready",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 11,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "w3r3XQ",
+                                  "name": "File scan_2026_03_14.jpg",
+                                  "width": "fill_container",
+                                  "fill": "#00000000",
+                                  "stroke": "#3a3a3c",
+                                  "strokeWidth": {
+                                    "bottom": 1
+                                  },
+                                  "strokeAlignment": "inner",
+                                  "gap": 9,
+                                  "padding": [
+                                    8,
+                                    12
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "xMCio",
+                                      "name": "Icon",
+                                      "width": 15,
+                                      "height": 15,
+                                      "icon": "image",
+                                      "library": "lucide",
+                                      "fill": "#8a8a8e"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "p2oRS",
+                                      "name": "Name Wrap",
+                                      "width": "fill_container",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "kmzb4",
+                                          "name": "Name",
+                                          "fill": "#aeaeb2",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "scan_2026_03_14.jpg",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 13,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "MwS6l",
+                                      "name": "St",
+                                      "fill": "#34c759",
+                                      "content": "ready",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 11,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "CBvRk",
+                                  "name": "File meeting_notes.docx",
+                                  "width": "fill_container",
+                                  "fill": "#00000000",
+                                  "stroke": "#3a3a3c",
+                                  "strokeWidth": {
+                                    "bottom": 1
+                                  },
+                                  "strokeAlignment": "inner",
+                                  "gap": 9,
+                                  "padding": [
+                                    8,
+                                    12
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "oQn13",
+                                      "name": "Icon",
+                                      "width": 15,
+                                      "height": 15,
+                                      "icon": "file-text",
+                                      "library": "lucide",
+                                      "fill": "#8a8a8e"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "j7WmD",
+                                      "name": "Name Wrap",
+                                      "width": "fill_container",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "VUAWL",
+                                          "name": "Name",
+                                          "fill": "#aeaeb2",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "meeting_notes.docx",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 13,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "f8Qg2",
+                                      "name": "St",
+                                      "fill": "#34c759",
+                                      "content": "ready",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 11,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "aWJ1z",
+                                  "name": "File receipt_amazon.pdf",
+                                  "width": "fill_container",
+                                  "fill": "#00000000",
+                                  "stroke": "#3a3a3c",
+                                  "strokeWidth": {
+                                    "bottom": 1
+                                  },
+                                  "strokeAlignment": "inner",
+                                  "gap": 9,
+                                  "padding": [
+                                    8,
+                                    12
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "P4KTt",
+                                      "name": "Icon",
+                                      "width": 15,
+                                      "height": 15,
+                                      "icon": "file-text",
+                                      "library": "lucide",
+                                      "fill": "#8a8a8e"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "hvN9k",
+                                      "name": "Name Wrap",
+                                      "width": "fill_container",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "W5qqQ4",
+                                          "name": "Name",
+                                          "fill": "#aeaeb2",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "receipt_amazon.pdf",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 13,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "n0t6A",
+                                      "name": "St",
+                                      "fill": "#34c759",
+                                      "content": "ready",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 11,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "X3BIpx",
+                                  "name": "File IMG_4821.png",
+                                  "width": "fill_container",
+                                  "fill": "#00000000",
+                                  "stroke": "#3a3a3c",
+                                  "strokeWidth": {
+                                    "bottom": 1
+                                  },
+                                  "strokeAlignment": "inner",
+                                  "gap": 9,
+                                  "padding": [
+                                    8,
+                                    12
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "ubN9P",
+                                      "name": "Icon",
+                                      "width": 15,
+                                      "height": 15,
+                                      "icon": "image",
+                                      "library": "lucide",
+                                      "fill": "#8a8a8e"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "JcXkq",
+                                      "name": "Name Wrap",
+                                      "width": "fill_container",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "VRIPe",
+                                          "name": "Name",
+                                          "fill": "#aeaeb2",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "IMG_4821.png",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 13,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "V095h",
+                                      "name": "Proc",
+                                      "gap": 5,
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "icon",
+                                          "id": "lNgc8",
+                                          "name": "Spin",
+                                          "width": 12,
+                                          "height": 12,
+                                          "icon": "loader-circle",
+                                          "library": "lucide",
+                                          "fill": "#0a84ff"
+                                        },
+                                        {
+                                          "type": "text",
+                                          "id": "Wl4Rb",
+                                          "name": "St",
+                                          "fill": "#0a84ff",
+                                          "content": "processing",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 11,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "h1BFa",
+                                  "name": "File budget_v2.xlsx",
+                                  "width": "fill_container",
+                                  "fill": "#00000000",
+                                  "stroke": "#3a3a3c",
+                                  "strokeWidth": {
+                                    "bottom": 1
+                                  },
+                                  "strokeAlignment": "inner",
+                                  "gap": 9,
+                                  "padding": [
+                                    8,
+                                    12
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "tExIv",
+                                      "name": "Icon",
+                                      "width": 15,
+                                      "height": 15,
+                                      "icon": "sheet",
+                                      "library": "lucide",
+                                      "fill": "#8a8a8e"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "Zdup6",
+                                      "name": "Name Wrap",
+                                      "width": "fill_container",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "rsrHO",
+                                          "name": "Name",
+                                          "fill": "#aeaeb2",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "budget_v2.xlsx",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 13,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "qz6P4",
+                                      "name": "St",
+                                      "fill": "#8a8a8e",
+                                      "content": "queued",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 11,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "D7F5a",
+                                  "name": "File contract_draft.pdf",
+                                  "width": "fill_container",
+                                  "fill": "#00000000",
+                                  "stroke": "#3a3a3c",
+                                  "strokeAlignment": "inner",
+                                  "gap": 9,
+                                  "padding": [
+                                    8,
+                                    12
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "SIgwo",
+                                      "name": "Icon",
+                                      "width": 15,
+                                      "height": 15,
+                                      "icon": "file-text",
+                                      "library": "lucide",
+                                      "fill": "#8a8a8e"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "roLiP",
+                                      "name": "Name Wrap",
+                                      "width": "fill_container",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "bNq7t",
+                                          "name": "Name",
+                                          "fill": "#aeaeb2",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "contract_draft.pdf",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 13,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "t6ugXp",
+                                      "name": "St",
+                                      "fill": "#8a8a8e",
+                                      "content": "queued",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 11,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
                             }
                           ]
                         },
                         {
-                          "type": "text",
-                          "id": "U4RpQM",
-                          "name": "Stage",
-                          "fill": "#5a5a60",
-                          "content": "walking",
-                          "fontFamily": "Inter",
-                          "fontSize": 12,
-                          "fontWeight": "normal"
-                        },
-                        {
                           "type": "frame",
-                          "id": "zIYb8",
-                          "name": "Job Id Wrap",
+                          "id": "aCwd2",
+                          "name": "Suggestions Pane",
+                          "clip": true,
                           "width": "fill_container",
-                          "justifyContent": "end",
+                          "height": "fill_container",
+                          "fill": "#2c2c2e",
+                          "cornerRadius": 10,
+                          "stroke": "#3a3a3c",
+                          "strokeWidth": 1,
+                          "strokeAlignment": "inner",
+                          "layout": "vertical",
                           "children": [
                             {
-                              "type": "text",
-                              "id": "a3I9u",
-                              "name": "Job Id",
-                              "fill": "#8a8a8e",
-                              "content": "a3f9c1e8",
-                              "fontFamily": "JetBrains Mono",
-                              "fontSize": 11,
-                              "fontWeight": "normal"
+                              "type": "frame",
+                              "id": "bVmc9",
+                              "name": "Pane Header",
+                              "width": "fill_container",
+                              "stroke": "#3a3a3c",
+                              "strokeWidth": {
+                                "bottom": 1
+                              },
+                              "strokeAlignment": "inner",
+                              "padding": [
+                                9,
+                                12
+                              ],
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "Y4aV9Q",
+                                  "name": "Title",
+                                  "fill": "#aeaeb2",
+                                  "content": "Suggestions",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "600",
+                                  "letterSpacing": 0.3
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "VzGSR",
+                                  "name": "Meta",
+                                  "fill": "#8a8a8e",
+                                  "content": "invoice_q1_2026.pdf",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "cqWLR",
+                              "name": "Suggestion List",
+                              "clip": true,
+                              "width": "fill_container",
+                              "height": "fill_container",
+                              "layout": "vertical",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "To292",
+                                  "name": "Sug Invoices",
+                                  "width": "fill_container",
+                                  "stroke": "#3a3a3c",
+                                  "strokeWidth": {
+                                    "bottom": 1
+                                  },
+                                  "strokeAlignment": "inner",
+                                  "gap": 11,
+                                  "padding": [
+                                    11,
+                                    12
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "Z3sLS",
+                                      "name": "Folder",
+                                      "width": 18,
+                                      "height": 18,
+                                      "icon": "folder",
+                                      "library": "lucide",
+                                      "fill": "#0a84ff"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "Sl5np",
+                                      "name": "Info",
+                                      "width": "fill_container",
+                                      "layout": "vertical",
+                                      "gap": 5,
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "fl9P0",
+                                          "name": "Folder Name",
+                                          "fill": "#f2f2f7",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "Invoices",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 13,
+                                          "fontWeight": "500"
+                                        },
+                                        {
+                                          "type": "text",
+                                          "id": "pqsMF",
+                                          "name": "Path",
+                                          "fill": "#8a8a8e",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "Documents / Finance / Invoices",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 11,
+                                          "fontWeight": "normal"
+                                        },
+                                        {
+                                          "type": "frame",
+                                          "id": "isX2a",
+                                          "name": "Confidence",
+                                          "gap": 7,
+                                          "alignItems": "center",
+                                          "children": [
+                                            {
+                                              "type": "frame",
+                                              "id": "NDcyV",
+                                              "name": "Bar Track",
+                                              "width": 110,
+                                              "height": 5,
+                                              "fill": "#3a3a3c",
+                                              "cornerRadius": 999,
+                                              "children": [
+                                                {
+                                                  "type": "rectangle",
+                                                  "cornerRadius": 999,
+                                                  "id": "vxtc5",
+                                                  "name": "Bar Fill",
+                                                  "fill": "#34c759",
+                                                  "width": 103,
+                                                  "height": "fill_container"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "text",
+                                              "id": "yz1zG",
+                                              "name": "Pct",
+                                              "fill": "#aeaeb2",
+                                              "content": "94% match",
+                                              "fontFamily": "Inter",
+                                              "fontSize": 11,
+                                              "fontWeight": "normal"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "npAzi",
+                                      "name": "Accept",
+                                      "fill": "#0a84ff",
+                                      "cornerRadius": 7,
+                                      "padding": [
+                                        6,
+                                        13
+                                      ],
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "nrKzZ",
+                                          "name": "Accept Label",
+                                          "fill": "#ffffff",
+                                          "content": "Accept",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 12,
+                                          "fontWeight": "600"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "zYO9y",
+                                  "name": "Sug 2026",
+                                  "width": "fill_container",
+                                  "stroke": "#3a3a3c",
+                                  "strokeWidth": {
+                                    "bottom": 1
+                                  },
+                                  "strokeAlignment": "inner",
+                                  "gap": 11,
+                                  "padding": [
+                                    11,
+                                    12
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "i9gXh",
+                                      "name": "Folder",
+                                      "width": 18,
+                                      "height": 18,
+                                      "icon": "folder",
+                                      "library": "lucide",
+                                      "fill": "#0a84ff"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "rpsKW",
+                                      "name": "Info",
+                                      "width": "fill_container",
+                                      "layout": "vertical",
+                                      "gap": 5,
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "hNENB",
+                                          "name": "Folder Name",
+                                          "fill": "#f2f2f7",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "2026",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 13,
+                                          "fontWeight": "500"
+                                        },
+                                        {
+                                          "type": "text",
+                                          "id": "QRPYU",
+                                          "name": "Path",
+                                          "fill": "#8a8a8e",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "Documents / Finance / 2026",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 11,
+                                          "fontWeight": "normal"
+                                        },
+                                        {
+                                          "type": "frame",
+                                          "id": "fXf9g",
+                                          "name": "Confidence",
+                                          "gap": 7,
+                                          "alignItems": "center",
+                                          "children": [
+                                            {
+                                              "type": "frame",
+                                              "id": "p7DQJi",
+                                              "name": "Bar Track",
+                                              "width": 110,
+                                              "height": 5,
+                                              "fill": "#3a3a3c",
+                                              "cornerRadius": 999,
+                                              "children": [
+                                                {
+                                                  "type": "rectangle",
+                                                  "cornerRadius": 999,
+                                                  "id": "PbCUw",
+                                                  "name": "Bar Fill",
+                                                  "fill": "#0a84ff",
+                                                  "width": 89,
+                                                  "height": "fill_container"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "text",
+                                              "id": "ipt7d",
+                                              "name": "Pct",
+                                              "fill": "#aeaeb2",
+                                              "content": "81% match",
+                                              "fontFamily": "Inter",
+                                              "fontSize": 11,
+                                              "fontWeight": "normal"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "FKfBM",
+                                      "name": "Accept",
+                                      "fill": "#00000000",
+                                      "cornerRadius": 7,
+                                      "stroke": "#0a84ff",
+                                      "strokeWidth": 1,
+                                      "strokeAlignment": "inner",
+                                      "padding": [
+                                        6,
+                                        13
+                                      ],
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "CqKZi",
+                                          "name": "Accept Label",
+                                          "fill": "#0a84ff",
+                                          "content": "Accept",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 12,
+                                          "fontWeight": "600"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "iZV3W",
+                                  "name": "Sug Receipts",
+                                  "width": "fill_container",
+                                  "stroke": "#3a3a3c",
+                                  "strokeAlignment": "inner",
+                                  "gap": 11,
+                                  "padding": [
+                                    11,
+                                    12
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "J5t6eo",
+                                      "name": "Folder",
+                                      "width": 18,
+                                      "height": 18,
+                                      "icon": "folder",
+                                      "library": "lucide",
+                                      "fill": "#0a84ff"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "B2z0Iw",
+                                      "name": "Info",
+                                      "width": "fill_container",
+                                      "layout": "vertical",
+                                      "gap": 5,
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "ps4OU",
+                                          "name": "Folder Name",
+                                          "fill": "#f2f2f7",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "Receipts",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 13,
+                                          "fontWeight": "500"
+                                        },
+                                        {
+                                          "type": "text",
+                                          "id": "y5pw4",
+                                          "name": "Path",
+                                          "fill": "#8a8a8e",
+                                          "textGrowth": "fixed-width",
+                                          "width": "fill_container",
+                                          "content": "Documents / Receipts",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 11,
+                                          "fontWeight": "normal"
+                                        },
+                                        {
+                                          "type": "frame",
+                                          "id": "z0me1A",
+                                          "name": "Confidence",
+                                          "gap": 7,
+                                          "alignItems": "center",
+                                          "children": [
+                                            {
+                                              "type": "frame",
+                                              "id": "RnSvs",
+                                              "name": "Bar Track",
+                                              "width": 110,
+                                              "height": 5,
+                                              "fill": "#3a3a3c",
+                                              "cornerRadius": 999,
+                                              "children": [
+                                                {
+                                                  "type": "rectangle",
+                                                  "cornerRadius": 999,
+                                                  "id": "B5eZF",
+                                                  "name": "Bar Fill",
+                                                  "fill": "#ff9f0a",
+                                                  "width": 68,
+                                                  "height": "fill_container"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "text",
+                                              "id": "vV01Q",
+                                              "name": "Pct",
+                                              "fill": "#aeaeb2",
+                                              "content": "62% match",
+                                              "fontFamily": "Inter",
+                                              "fontSize": 11,
+                                              "fontWeight": "normal"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "BUECj",
+                                      "name": "Accept",
+                                      "fill": "#00000000",
+                                      "cornerRadius": 7,
+                                      "stroke": "#0a84ff",
+                                      "strokeWidth": 1,
+                                      "strokeAlignment": "inner",
+                                      "padding": [
+                                        6,
+                                        13
+                                      ],
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "i1l7J",
+                                          "name": "Accept Label",
+                                          "fill": "#0a84ff",
+                                          "content": "Accept",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 12,
+                                          "fontWeight": "600"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
                             }
                           ]
                         }
@@ -2976,115 +3870,503 @@
                     },
                     {
                       "type": "frame",
-                      "id": "AL73R",
-                      "name": "Counters",
-                      "gap": 18,
+                      "id": "G5Sf7j",
+                      "name": "Library Pane",
+                      "clip": true,
+                      "width": 300,
+                      "height": "fill_container",
+                      "fill": "#2c2c2e",
+                      "cornerRadius": 10,
+                      "stroke": "#3a3a3c",
+                      "strokeWidth": 1,
+                      "strokeAlignment": "inner",
+                      "layout": "vertical",
                       "children": [
                         {
                           "type": "frame",
-                          "id": "agMmi",
-                          "name": "Counter seen",
-                          "layout": "vertical",
-                          "gap": 2,
+                          "id": "AiVd3",
+                          "name": "Pane Header",
+                          "width": "fill_container",
+                          "stroke": "#3a3a3c",
+                          "strokeWidth": {
+                            "bottom": 1
+                          },
+                          "strokeAlignment": "inner",
+                          "padding": [
+                            9,
+                            12
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
                           "children": [
                             {
                               "type": "text",
-                              "id": "hK4ym",
-                              "name": "Value",
-                              "fill": "#1c1c1e",
-                              "content": "1,284",
+                              "id": "XJipd",
+                              "name": "Title",
+                              "fill": "#aeaeb2",
+                              "content": "Library",
                               "fontFamily": "Inter",
-                              "fontSize": 20,
-                              "fontWeight": "600"
+                              "fontSize": 12,
+                              "fontWeight": "600",
+                              "letterSpacing": 0.3
                             },
                             {
                               "type": "text",
-                              "id": "Jqijz",
-                              "name": "Label",
+                              "id": "HhZk4",
+                              "name": "Meta",
                               "fill": "#8a8a8e",
-                              "content": "SEEN",
+                              "content": "~/Documents",
                               "fontFamily": "Inter",
                               "fontSize": 11,
-                              "fontWeight": "normal",
-                              "letterSpacing": 0.5
+                              "fontWeight": "normal"
                             }
                           ]
                         },
                         {
                           "type": "frame",
-                          "id": "IGUP3",
-                          "name": "Counter indexed",
+                          "id": "C02BF",
+                          "name": "Tree",
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": "fill_container",
                           "layout": "vertical",
-                          "gap": 2,
                           "children": [
                             {
-                              "type": "text",
-                              "id": "ZsxXM",
-                              "name": "Value",
-                              "fill": "#1c1c1e",
-                              "content": "1,190",
-                              "fontFamily": "Inter",
-                              "fontSize": 20,
-                              "fontWeight": "600"
+                              "type": "frame",
+                              "id": "Kx4C9",
+                              "name": "Node Documents",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "bwCTu",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "WYnNq",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Documents",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
                             },
                             {
-                              "type": "text",
-                              "id": "Ttuci",
-                              "name": "Label",
-                              "fill": "#8a8a8e",
-                              "content": "INDEXED",
-                              "fontFamily": "Inter",
-                              "fontSize": 11,
-                              "fontWeight": "normal",
-                              "letterSpacing": 0.5
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "u3gw4W",
-                          "name": "Counter skipped",
-                          "layout": "vertical",
-                          "gap": 2,
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "SbXa4",
-                              "name": "Value",
-                              "fill": "#1c1c1e",
-                              "content": "94",
-                              "fontFamily": "Inter",
-                              "fontSize": 20,
-                              "fontWeight": "600"
+                              "type": "frame",
+                              "id": "plAmR",
+                              "name": "Node Finance",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                30
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "Ofmnx",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "qfXOo",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Finance",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
                             },
                             {
-                              "type": "text",
-                              "id": "c1LAi",
-                              "name": "Label",
-                              "fill": "#8a8a8e",
-                              "content": "SKIPPED",
-                              "fontFamily": "Inter",
-                              "fontSize": 11,
-                              "fontWeight": "normal",
-                              "letterSpacing": 0.5
+                              "type": "frame",
+                              "id": "X4ji05",
+                              "name": "Node Invoices",
+                              "width": "fill_container",
+                              "fill": "#0a84ff1f",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                48
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "xjyFL",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#0a84ff"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "OnDme",
+                                  "name": "Name",
+                                  "fill": "#0a84ff",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Invoices",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "j2MNy",
+                                  "name": "Target",
+                                  "width": 13,
+                                  "height": 13,
+                                  "icon": "sparkles",
+                                  "library": "lucide",
+                                  "fill": "#0a84ff"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "yQ12I",
+                              "name": "Node 2026",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                48
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "g2Q0hQ",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "L0jXHQ",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "2026",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "udNTl",
+                              "name": "Node Receipts",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                30
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "uZrHT",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "lBRxh",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Receipts",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "PP78L",
+                              "name": "Node Personal",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                30
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "C5SOa",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "PuwlI",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Personal",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "r0qIFq",
+                              "name": "Node Media",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "v5IuT",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "MAL1W",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Media",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "w2d6AR",
+                              "name": "Node Photos",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                30
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "eOjfk",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "jQWmO",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Photos",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "Y8875",
+                              "name": "Node Videos",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12,
+                                7,
+                                30
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "rFMju",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "KcSDM",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Videos",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "e5Wbkx",
+                              "name": "Node Projects",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "qpbM6",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "O2peLD",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Projects",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "f5SIC",
+                              "name": "Node Archive",
+                              "width": "fill_container",
+                              "fill": "#00000000",
+                              "gap": 8,
+                              "padding": [
+                                7,
+                                12
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "K10i7n",
+                                  "name": "Folder",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "folder",
+                                  "library": "lucide",
+                                  "fill": "#8a8a8e"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "LSdXs",
+                                  "name": "Name",
+                                  "fill": "#aeaeb2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Archive",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
                             }
                           ]
                         }
                       ]
                     }
                   ]
-                },
-                {
-                  "type": "text",
-                  "id": "ITXst",
-                  "name": "Coming Soon",
-                  "fill": "#aeaeb2",
-                  "textGrowth": "fixed-width",
-                  "width": "fill_container",
-                  "content": "Inbox files and folder tree will live here. (Coming soon.)",
-                  "fontFamily": "Inter",
-                  "fontSize": 14,
-                  "fontWeight": "normal"
                 }
               ]
             }
