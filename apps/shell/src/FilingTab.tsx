@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 
@@ -61,7 +62,16 @@ export function FilingTab() {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [revealedPath, setRevealedPath] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<string | null>(null);
-  const dragFileIdRef = useRef<string | null>(null);
+  // Pointer-based drag (Tauri's native drag handler blocks HTML5 DnD in the
+  // webview, so we track the drag ourselves with pointer events).
+  const dragSrcRef = useRef<{ fileId: string; filename: string } | null>(null);
+  const dragStartRef = useRef<{ x: number; y: number } | null>(null);
+  const didDragRef = useRef(false);
+  const [ghost, setGhost] = useState<{
+    filename: string;
+    x: number;
+    y: number;
+  } | null>(null);
 
   const selectedIdRef = useRef<string | null>(null);
   selectedIdRef.current = selectedId;
@@ -186,31 +196,63 @@ export function FilingTab() {
     [dropFromQueue]
   );
 
-  // Drop a suggestion (== the selected file) onto a folder in the Library pane.
-  const fileIntoFolder = useCallback(
-    async (fileId: string, folderPath: string) => {
-      try {
-        const res = await fetch(`${BACKEND_URL}/filing/files/${fileId}/file`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ folder_path: folderPath }),
-        });
-        if (res.ok) dropFromQueue(fileId);
-      } catch {
-        // ignore
-      }
+  // Resolve the folder path under a screen point (null if not over a folder).
+  const folderPathAt = (x: number, y: number): string | null => {
+    const el = document.elementFromPoint(x, y);
+    const row = el?.closest("[data-folder-path]");
+    return row ? row.getAttribute("data-folder-path") : null;
+  };
+
+  const onDragMove = useCallback((e: PointerEvent) => {
+    const start = dragStartRef.current;
+    const src = dragSrcRef.current;
+    if (!start || !src) return;
+    if (!didDragRef.current) {
+      if (Math.hypot(e.clientX - start.x, e.clientY - start.y) < 5) return;
+      didDragRef.current = true;
+    }
+    setGhost({ filename: src.filename, x: e.clientX, y: e.clientY });
+    setDropTarget(folderPathAt(e.clientX, e.clientY));
+  }, []);
+
+  const onDragEnd = useCallback(
+    (e: PointerEvent) => {
+      window.removeEventListener("pointermove", onDragMove);
+      window.removeEventListener("pointerup", onDragEnd);
+      window.removeEventListener("pointercancel", onDragEnd);
+      // Re-enable text selection.
+      document.body.style.removeProperty("user-select");
+      document.body.style.removeProperty("-webkit-user-select");
+      const src = dragSrcRef.current;
+      const wasDrag = didDragRef.current;
+      dragSrcRef.current = null;
+      dragStartRef.current = null;
+      setGhost(null);
+      setDropTarget(null);
+      if (!wasDrag || !src) return;
+      const target = folderPathAt(e.clientX, e.clientY);
+      // TODO: call POST /filing/files/{id}/file to actually file it. For now
+      // just confirm the drag wiring with an alert showing source → target.
+      if (target) window.alert(`File "${src.filename}" → folder "${target}"`);
     },
-    [dropFromQueue]
+    [onDragMove]
   );
 
-  const onFolderDrop = useCallback(
-    (folderPath: string) => {
-      const fileId = dragFileIdRef.current;
-      dragFileIdRef.current = null;
-      setDropTarget(null);
-      if (fileId) fileIntoFolder(fileId, folderPath);
+  const startFileDrag = useCallback(
+    (e: ReactPointerEvent, file: UnfiledFile) => {
+      if (e.button !== 0) return;
+      dragSrcRef.current = { fileId: file.file_id, filename: file.filename };
+      dragStartRef.current = { x: e.clientX, y: e.clientY };
+      didDragRef.current = false;
+      // Suppress page-wide text selection while the pointer is down.
+      document.body.style.setProperty("user-select", "none");
+      document.body.style.setProperty("-webkit-user-select", "none");
+      window.getSelection()?.removeAllRanges();
+      window.addEventListener("pointermove", onDragMove);
+      window.addEventListener("pointerup", onDragEnd);
+      window.addEventListener("pointercancel", onDragEnd);
     },
-    [fileIntoFolder]
+    [onDragMove, onDragEnd]
   );
 
   const toggleExpand = useCallback((path: string) => {
@@ -272,7 +314,15 @@ export function FilingTab() {
                 <li
                   key={f.file_id}
                   className={`file-row${f.file_id === selectedId ? " selected" : ""}`}
-                  onClick={() => setSelectedId(f.file_id)}
+                  title="Click to select · drag onto a folder to file here"
+                  onPointerDown={(e) => startFileDrag(e, f)}
+                  onClick={() => {
+                    if (didDragRef.current) {
+                      didDragRef.current = false;
+                      return;
+                    }
+                    setSelectedId(f.file_id);
+                  }}
                 >
                   <FileIcon kind={f.kind} />
                   <span className="file-name">{f.filename}</span>
@@ -311,17 +361,14 @@ export function FilingTab() {
                       s.folder_path === revealedPath ? " active" : ""
                     }`}
                     key={s.suggestion_id}
-                    draggable
                     title="Click to locate · drag onto a folder to file here"
-                    onClick={() => reveal(s.folder_path)}
-                    onDragStart={(e) => {
-                      dragFileIdRef.current = selectedFile.file_id;
-                      e.dataTransfer.setData("text/plain", selectedFile.filename);
-                      e.dataTransfer.effectAllowed = "move";
-                    }}
-                    onDragEnd={() => {
-                      dragFileIdRef.current = null;
-                      setDropTarget(null);
+                    onPointerDown={(e) => startFileDrag(e, selectedFile)}
+                    onClick={() => {
+                      if (didDragRef.current) {
+                        didDragRef.current = false;
+                        return;
+                      }
+                      reveal(s.folder_path);
                     }}
                   >
                     <FolderIcon />
@@ -371,13 +418,20 @@ export function FilingTab() {
                 revealedPath={revealedPath}
                 dropTarget={dropTarget}
                 onToggle={toggleExpand}
-                onSetDropTarget={setDropTarget}
-                onDrop={onFolderDrop}
               />
             ))}
           </div>
         </div>
       </div>
+
+      {ghost && (
+        <div
+          className="drag-ghost"
+          style={{ left: ghost.x + 14, top: ghost.y + 12 }}
+        >
+          {ghost.filename}
+        </div>
+      )}
     </section>
   );
 }
@@ -389,8 +443,6 @@ function TreeNode({
   revealedPath,
   dropTarget,
   onToggle,
-  onSetDropTarget,
-  onDrop,
 }: {
   node: FolderNode;
   depth: number;
@@ -398,8 +450,6 @@ function TreeNode({
   revealedPath: string | null;
   dropTarget: string | null;
   onToggle: (path: string) => void;
-  onSetDropTarget: (path: string | null) => void;
-  onDrop: (path: string) => void;
 }) {
   const hasChildren = node.children.length > 0;
   const isOpen = expanded.has(node.path);
@@ -413,22 +463,8 @@ function TreeNode({
           isDropTarget ? " drop-target" : ""
         }${hasChildren ? " has-children" : ""}`}
         style={{ paddingLeft: 12 + depth * 18 }}
+        data-folder-path={node.path}
         onClick={() => hasChildren && onToggle(node.path)}
-        onDragOver={(e) => {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = "move";
-          if (dropTarget !== node.path) onSetDropTarget(node.path);
-        }}
-        onDragLeave={(e) => {
-          // Only clear if leaving the row entirely (not entering a child).
-          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-            onSetDropTarget(null);
-          }
-        }}
-        onDrop={(e) => {
-          e.preventDefault();
-          onDrop(node.path);
-        }}
       >
         {hasChildren ? (
           <ChevronIcon open={isOpen} />
@@ -450,8 +486,6 @@ function TreeNode({
             revealedPath={revealedPath}
             dropTarget={dropTarget}
             onToggle={onToggle}
-            onSetDropTarget={onSetDropTarget}
-            onDrop={onDrop}
           />
         ))}
     </>

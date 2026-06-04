@@ -278,7 +278,12 @@ html,
   gap: 9px;
   padding: 8px 12px;
   border-bottom: 1px solid #e3e3e6;
-  cursor: pointer;
+  cursor: grab;
+  user-select: none;
+}
+
+.file-row:active {
+  cursor: grabbing;
 }
 
 .file-row:last-child {
@@ -535,14 +540,11 @@ html,
 }
 
 .sug-row {
-  cursor: pointer;
-}
-
-.sug-row[draggable="true"] {
   cursor: grab;
+  user-select: none;
 }
 
-.sug-row[draggable="true"]:active {
+.sug-row:active {
   cursor: grabbing;
 }
 
@@ -552,6 +554,20 @@ html,
 
 .sug-row.active {
   background: rgba(10, 132, 255, 0.08);
+}
+
+.drag-ghost {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1c1c1e;
+  background: #fff;
+  border: 1px solid #c7c7cc;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
 
 button.primary {
@@ -871,5 +887,11 @@ button.primary:disabled {
   }
   .tree-row.drop-target {
     background: rgba(10, 132, 255, 0.22);
+  }
+  .drag-ghost {
+    color: #f2f2f7;
+    background: #2c2c2e;
+    border-color: #3a3a3c;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
   }
 }
