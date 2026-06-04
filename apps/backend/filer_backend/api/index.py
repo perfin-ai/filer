@@ -113,10 +113,13 @@ def list_history() -> list[IndexHistoryEntry]:
                 .select_from(File)
                 .where(File.absolute_path.like(_like_prefix(job.root_path), escape="\\"))
             ).scalar_one()
+            last_indexed = job.completed_at or job.updated_at
+            if last_indexed is not None and last_indexed.tzinfo is None:
+                last_indexed = last_indexed.replace(tzinfo=timezone.utc)
             entries.append(
                 IndexHistoryEntry(
                     root_path=job.root_path,
-                    last_indexed_at=job.completed_at or job.updated_at,
+                    last_indexed_at=last_indexed,
                     last_status=job.status,
                     last_job_id=job.id,
                     file_count=count,

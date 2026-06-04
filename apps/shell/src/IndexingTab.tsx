@@ -40,15 +40,20 @@ const TERMINAL: ReadonlySet<JobStatus> = new Set([
   "cancelled",
 ]);
 
-function formatDate(iso: string | null): string {
+function formatDateTime(iso: string | null): string {
   if (!iso) return "never";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "unknown";
-  return d.toLocaleDateString(undefined, {
+  const date = d.toLocaleDateString(undefined, {
     year: "numeric",
     month: "short",
     day: "numeric",
   });
+  const time = d.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  return `${date} ${time}`;
 }
 
 export function IndexingTab() {
@@ -289,7 +294,7 @@ export function IndexingTab() {
                   <div className="history-info">
                     <div className="history-folder">{entry.root_path}</div>
                     <div className="history-meta">
-                      {verb} {formatDate(entry.last_indexed_at)} ·{" "}
+                      {verb} {formatDateTime(entry.last_indexed_at)} ·{" "}
                       {entry.file_count.toLocaleString()} files
                     </div>
                   </div>
