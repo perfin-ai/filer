@@ -38,7 +38,12 @@ type SuggestionList = {
   suggestions: Suggestion[];
 };
 
-type FolderEntry = { name: string; path: string };
+type FsEntry = {
+  name: string;
+  path: string;
+  is_dir: boolean;
+  kind?: FileKind;
+};
 
 // The Library tree is rooted here and read lazily from the real filesystem.
 const LIBRARY_ROOT = "/Volumes";
@@ -48,9 +53,9 @@ export function FilingTab() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestionList | null>(null);
   const [childrenByPath, setChildrenByPath] = useState<
-    Record<string, FolderEntry[]>
+    Record<string, FsEntry[]>
   >({});
-  const childrenRef = useRef<Record<string, FolderEntry[]>>({});
+  const childrenRef = useRef<Record<string, FsEntry[]>>({});
   const [dragging, setDragging] = useState(false);
   const [accepting, setAccepting] = useState<string | null>(null);
 
@@ -75,14 +80,14 @@ export function FilingTab() {
 
   // Lazily fetch a folder's immediate children (memoized via childrenRef).
   const loadChildren = useCallback(
-    async (path: string): Promise<FolderEntry[]> => {
+    async (path: string): Promise<FsEntry[]> => {
       if (childrenRef.current[path]) return childrenRef.current[path];
       try {
         const res = await fetch(
-          `${BACKEND_URL}/filing/folders?path=${encodeURIComponent(path)}`
+          `${BACKEND_URL}/filing/entries?path=${encodeURIComponent(path)}`
         );
         if (!res.ok) return [];
-        const data = (await res.json()) as FolderEntry[];
+        const data = (await res.json()) as FsEntry[];
         childrenRef.current = { ...childrenRef.current, [path]: data };
         setChildrenByPath(childrenRef.current);
         return data;
@@ -500,15 +505,16 @@ function TreeNode({
   childrenByPath,
   onToggle,
 }: {
-  node: FolderEntry;
+  node: FsEntry;
   depth: number;
   expanded: Set<string>;
   revealedPath: string | null;
   dropTarget: string | null;
-  childrenByPath: Record<string, FolderEntry[]>;
+  childrenByPath: Record<string, FsEntry[]>;
   onToggle: (path: string) => void;
 }) {
-  const isOpen = expanded.has(node.path);
+  const isDir = node.is_dir;
+  const isOpen = isDir && expanded.has(node.path);
   const highlighted = node.path === revealedPath;
   const isDropTarget = node.path === dropTarget;
   const kids = childrenByPath[node.path];
@@ -516,16 +522,21 @@ function TreeNode({
   return (
     <>
       <div
-        className={`tree-row has-children${highlighted ? " highlight" : ""}${
-          isDropTarget ? " drop-target" : ""
-        }`}
+        className={`tree-row${isDir ? " has-children" : ""}${
+          highlighted ? " highlight" : ""
+        }${isDropTarget ? " drop-target" : ""}`}
         style={{ paddingLeft: 12 + depth * 18 }}
-        data-folder-path={node.path}
+        // Only folders are drop targets.
+        {...(isDir ? { "data-folder-path": node.path } : {})}
         title={node.path}
-        onClick={() => onToggle(node.path)}
+        onClick={isDir ? () => onToggle(node.path) : undefined}
       >
-        <ChevronIcon open={isOpen} />
-        <FolderIcon small />
+        {isDir ? (
+          <ChevronIcon open={isOpen} />
+        ) : (
+          <span className="tree-chevron spacer" />
+        )}
+        {isDir ? <FolderIcon small /> : <FileIcon kind={node.kind ?? "other"} />}
         <span className="tree-name">{node.name}</span>
         {highlighted && <SparkleIcon />}
       </div>
