@@ -521,6 +521,7 @@ function TreeNode({
         }`}
         style={{ paddingLeft: 12 + depth * 18 }}
         data-folder-path={node.path}
+        title={node.path}
         onClick={() => onToggle(node.path)}
       >
         <ChevronIcon open={isOpen} />
