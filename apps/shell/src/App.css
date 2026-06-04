@@ -256,6 +256,102 @@ button.primary:disabled {
   letter-spacing: 0.04em;
 }
 
+.history {
+  margin-top: 24px;
+}
+
+.history h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #5a5a60;
+}
+
+.history-empty {
+  font-size: 13px;
+  color: #8a8a8e;
+}
+
+.history-scroll {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e3e3e6;
+  border-radius: 10px;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid #e3e3e6;
+}
+
+.history-row:last-child {
+  border-bottom: none;
+}
+
+.history-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-folder {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  color: #1c1c1e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-meta {
+  font-size: 12px;
+  color: #8a8a8e;
+  margin-top: 3px;
+}
+
+.history-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #8a8a8e;
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s;
+}
+
+.icon-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.06);
+  color: #0a84ff;
+}
+
+.icon-btn.danger:hover:not(:disabled) {
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+}
+
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 @media (prefers-color-scheme: dark) {
   .drop-zone {
     background: #2c2c2e;
@@ -303,5 +399,24 @@ button.primary:disabled {
   }
   .panel p {
     color: #aeaeb2;
+  }
+  .history h3 {
+    color: #aeaeb2;
+  }
+  .history-scroll {
+    background: #2c2c2e;
+    border-color: #3a3a3c;
+  }
+  .history-row {
+    border-bottom-color: #3a3a3c;
+  }
+  .history-folder {
+    color: #f2f2f7;
+  }
+  .icon-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .icon-btn.danger:hover:not(:disabled) {
+    background: rgba(255, 59, 48, 0.16);
   }
 }
