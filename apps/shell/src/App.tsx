@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { IndexingTab } from "./IndexingTab";
+import { FilingTab } from "./FilingTab";
 import "./App.css";
 
 type Tab = "indexing" | "filing";
@@ -58,14 +59,5 @@ export default function App() {
         {tab === "filing" && <FilingTab />}
       </main>
     </div>
-  );
-}
-
-function FilingTab() {
-  return (
-    <section className="panel">
-      <h2>Filing</h2>
-      <p>Inbox files and folder tree will live here. (Coming soon.)</p>
-    </section>
   );
 }

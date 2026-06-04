@@ -57,6 +57,17 @@ class AcceptResult(BaseModel):
     moved_to: str
 
 
+class FileIntoFolderRequest(BaseModel):
+    folder_path: str
+
+
+class FiledResult(BaseModel):
+    file_id: str
+    folder_path: str
+    status: FileStatus
+    moved_to: str
+
+
 class FolderNode(BaseModel):
     name: str
     path: str
@@ -263,6 +274,23 @@ def accept_suggestion(file_id: str, suggestion_id: str) -> AcceptResult:
         suggestion_id=suggestion_id,
         status="filed",
         moved_to=f"{suggestion.absolute_path}/{file.filename}",
+    )
+
+
+@router.post("/files/{file_id}/file", response_model=FiledResult)
+def file_into_folder(file_id: str, req: FileIntoFolderRequest) -> FiledResult:
+    """File a document into an arbitrary folder (e.g. via drag-and-drop)."""
+    file = _FILES_BY_ID.get(file_id)
+    if file is None:
+        raise HTTPException(status_code=404, detail="file not found")
+    folder = req.folder_path.strip().strip("/")
+    if not folder:
+        raise HTTPException(status_code=400, detail="folder_path is required")
+    return FiledResult(
+        file_id=file_id,
+        folder_path=folder,
+        status="filed",
+        moved_to=f"{_LIBRARY_ROOT}/{folder}/{file.filename}",
     )
 
 
