@@ -4,12 +4,16 @@ Serves the Filing screen: unfiled files awaiting organization, per-file
 folder suggestions, accepting a suggestion, and the destination folder
 hierarchy.
 
-NOTE: every response here is mock data. The shapes are stable so the
-frontend can build against them; the bodies will be replaced with real
-business logic (Celery processing + a suggestion model) later.
+The unfiled queue and the per-file accept/processing flow are still mock
+data (to be replaced by Celery + a suggestion model). The folder tree
+(`GET /folders`) reads the real filesystem under /Volumes, lazily one
+level at a time, and suggestions point at real folder paths.
 """
 
+import os
+import random
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException
@@ -68,22 +72,22 @@ class FiledResult(BaseModel):
     moved_to: str
 
 
-class FolderNode(BaseModel):
+class FolderEntry(BaseModel):
     name: str
     path: str
-    children: list["FolderNode"] = []
-
-
-class FolderHierarchy(BaseModel):
-    root_path: str
-    children: list[FolderNode]
 
 
 # --------------------------------------------------------------------------- #
-# Mock data
+# Mock data + real-filesystem config
 # --------------------------------------------------------------------------- #
 _DROP_ROOT = "/Users/ericmelz/Downloads/to-file"
-_LIBRARY_ROOT = "/Users/ericmelz"
+# The library is the real filesystem rooted here; the tree is read lazily.
+_LIBRARY_ROOT = "/Volumes"
+# The top suggestion always points at this real folder.
+_RECORDS_FOLDER = (
+    "/Volumes/home/_Documents/_Records/_By Year/_2026/"
+    "Banking/Credit/Fidelity/Visa 6665/Documents"
+)
 
 
 def _ts(day: int, hour: int, minute: int) -> datetime:
@@ -166,67 +170,88 @@ _FILES: list[UnfiledFile] = [
 _FILES_BY_ID: dict[str, UnfiledFile] = {f.file_id: f for f in _FILES}
 
 
-def _sugg(sid: str, path: str, confidence: float, rationale: str) -> Suggestion:
+def _list_subdirs(path: Path) -> list[Path]:
+    """Immediate subdirectories of `path`, sorted; [] on any access error.
+
+    Skips dotfiles and symlinks (the latter avoids loops and the
+    /Volumes/Macintosh HD -> / link). Errors (incl. EPERM on TCC-gated
+    network volumes) degrade gracefully to an empty list.
+    """
+    try:
+        entries = []
+        with os.scandir(path) as it:
+            for e in it:
+                if e.name.startswith("."):
+                    continue
+                try:
+                    if e.is_dir(follow_symlinks=False):
+                        entries.append(Path(e.path))
+                except OSError:
+                    continue
+        entries.sort(key=lambda p: p.name.lower())
+        return entries
+    except OSError:
+        return []
+
+
+def _random_dirs(n: int) -> list[str]:
+    """Pick `n` distinct real folders by random-walking down from the root."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for _ in range(n * 8):
+        if len(out) >= n:
+            break
+        cur = Path(_LIBRARY_ROOT)
+        for _ in range(random.randint(1, 4)):
+            subs = _list_subdirs(cur)
+            if not subs:
+                break
+            cur = random.choice(subs)
+        s = str(cur)
+        if s != _LIBRARY_ROOT and s != _RECORDS_FOLDER and s not in seen:
+            seen.add(s)
+            out.append(s)
+    return out
+
+
+def _suggestion(sid: str, path: str, confidence: float, rationale: str) -> Suggestion:
     return Suggestion(
         suggestion_id=sid,
-        folder_name=path.rsplit("/", 1)[-1],
+        folder_name=Path(path).name,
         folder_path=path,
-        absolute_path=f"{_LIBRARY_ROOT}/{path}",
+        absolute_path=path,
         confidence=confidence,
         rationale=rationale,
     )
 
 
-_SUGGESTIONS: dict[str, list[Suggestion]] = {
-    "f_invoice_q1": [
-        _sugg("s_inv_invoices", "Documents/Finance/Invoices", 0.94,
-              "Filename contains 'invoice'; similar PDFs filed here."),
-        _sugg("s_inv_2026", "Documents/Finance/2026", 0.81,
-              "Dated Q1 2026; matches the 2026 finance archive."),
-        _sugg("s_inv_receipts", "Documents/Receipts", 0.62,
-              "Financial document; receipts are a possible fit."),
-    ],
-    "f_scan_0314": [
-        _sugg("s_scan_photos", "Media/Photos", 0.77, "Image file."),
-        _sugg("s_scan_receipts", "Documents/Receipts", 0.58,
-              "Scanned document may be a receipt."),
-    ],
-    "f_meeting_notes": [
-        _sugg("s_mn_personal", "Documents/Personal", 0.71, "Notes document."),
-        _sugg("s_mn_projects", "Projects", 0.55, "May relate to a project."),
-    ],
-    "f_receipt_amazon": [
-        _sugg("s_rec_receipts", "Documents/Receipts", 0.9,
-              "Filename contains 'receipt'."),
-        _sugg("s_rec_finance", "Documents/Finance/2026", 0.64,
-              "Financial document from 2026."),
-    ],
-}
+# Generated suggestions are memoized per file so accept/drag can resolve the
+# same ids the listing returned (the random folders stay stable per session).
+_suggestion_cache: dict[str, list[Suggestion]] = {}
 
 
-def _folder(name: str, path: str, *children: FolderNode) -> FolderNode:
-    return FolderNode(name=name, path=path, children=list(children))
-
-
-_HIERARCHY: list[FolderNode] = [
-    _folder(
-        "Documents", "Documents",
-        _folder(
-            "Finance", "Documents/Finance",
-            _folder("Invoices", "Documents/Finance/Invoices"),
-            _folder("2026", "Documents/Finance/2026"),
-        ),
-        _folder("Receipts", "Documents/Receipts"),
-        _folder("Personal", "Documents/Personal"),
-    ),
-    _folder(
-        "Media", "Media",
-        _folder("Photos", "Media/Photos"),
-        _folder("Videos", "Media/Videos"),
-    ),
-    _folder("Projects", "Projects"),
-    _folder("Archive", "Archive"),
-]
+def _build_suggestions(file_id: str) -> list[Suggestion]:
+    if file_id in _suggestion_cache:
+        return _suggestion_cache[file_id]
+    suggestions = [
+        _suggestion(
+            "s_records",
+            _RECORDS_FOLDER,
+            0.94,
+            "Matches your Records filing for Fidelity Visa statements.",
+        )
+    ]
+    for i, folder in enumerate(_random_dirs(2)):
+        suggestions.append(
+            _suggestion(
+                f"s_rand_{i}",
+                folder,
+                round(random.uniform(0.45, 0.82), 2),
+                "Another folder on this system.",
+            )
+        )
+    _suggestion_cache[file_id] = suggestions
+    return suggestions
 
 
 # --------------------------------------------------------------------------- #
@@ -245,7 +270,7 @@ def get_suggestions(file_id: str) -> SuggestionList:
     if file is None:
         raise HTTPException(status_code=404, detail="file not found")
     suggestions = sorted(
-        _SUGGESTIONS.get(file_id, []),
+        _build_suggestions(file_id),
         key=lambda s: s.confidence,
         reverse=True,
     )
@@ -264,7 +289,7 @@ def accept_suggestion(file_id: str, suggestion_id: str) -> AcceptResult:
     if file is None:
         raise HTTPException(status_code=404, detail="file not found")
     suggestion = next(
-        (s for s in _SUGGESTIONS.get(file_id, []) if s.suggestion_id == suggestion_id),
+        (s for s in _build_suggestions(file_id) if s.suggestion_id == suggestion_id),
         None,
     )
     if suggestion is None:
@@ -283,18 +308,23 @@ def file_into_folder(file_id: str, req: FileIntoFolderRequest) -> FiledResult:
     file = _FILES_BY_ID.get(file_id)
     if file is None:
         raise HTTPException(status_code=404, detail="file not found")
-    folder = req.folder_path.strip().strip("/")
+    folder = req.folder_path.strip().rstrip("/")
     if not folder:
         raise HTTPException(status_code=400, detail="folder_path is required")
+    base = folder if folder.startswith("/") else f"{_LIBRARY_ROOT}/{folder}"
     return FiledResult(
         file_id=file_id,
         folder_path=folder,
         status="filed",
-        moved_to=f"{_LIBRARY_ROOT}/{folder}/{file.filename}",
+        moved_to=f"{base}/{file.filename}",
     )
 
 
-@router.get("/folder-hierarchy", response_model=FolderHierarchy)
-def get_folder_hierarchy() -> FolderHierarchy:
-    """The destination library's folder tree."""
-    return FolderHierarchy(root_path=_LIBRARY_ROOT, children=_HIERARCHY)
+@router.get("/folders", response_model=list[FolderEntry])
+def list_folders(path: str = _LIBRARY_ROOT) -> list[FolderEntry]:
+    """Immediate subfolders of `path` (defaults to the library root).
+
+    The Library pane calls this lazily, one level per expansion, so large or
+    slow (network) volumes under /Volumes don't have to be read up front.
+    """
+    return [FolderEntry(name=p.name, path=str(p)) for p in _list_subdirs(Path(path))]

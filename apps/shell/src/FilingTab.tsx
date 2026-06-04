@@ -38,23 +38,19 @@ type SuggestionList = {
   suggestions: Suggestion[];
 };
 
-type FolderNode = { name: string; path: string; children: FolderNode[] };
-type FolderHierarchy = { root_path: string; children: FolderNode[] };
+type FolderEntry = { name: string; path: string };
 
-// Every folder prefix along a path, e.g.
-// "Documents/Finance/Invoices" -> ["Documents","Documents/Finance","Documents/Finance/Invoices"]
-function ancestorPaths(path: string): string[] {
-  const parts = path.split("/");
-  const out: string[] = [];
-  for (let i = 1; i <= parts.length; i++) out.push(parts.slice(0, i).join("/"));
-  return out;
-}
+// The Library tree is rooted here and read lazily from the real filesystem.
+const LIBRARY_ROOT = "/Volumes";
 
 export function FilingTab() {
   const [files, setFiles] = useState<UnfiledFile[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestionList | null>(null);
-  const [hierarchy, setHierarchy] = useState<FolderHierarchy | null>(null);
+  const [childrenByPath, setChildrenByPath] = useState<
+    Record<string, FolderEntry[]>
+  >({});
+  const childrenRef = useRef<Record<string, FolderEntry[]>>({});
   const [dragging, setDragging] = useState(false);
   const [accepting, setAccepting] = useState<string | null>(null);
 
@@ -75,11 +71,48 @@ export function FilingTab() {
 
   const selectedIdRef = useRef<string | null>(null);
   selectedIdRef.current = selectedId;
+  const treeRef = useRef<HTMLDivElement | null>(null);
 
-  const reveal = useCallback((path: string) => {
-    setRevealedPath(path);
-    setExpanded(new Set(ancestorPaths(path)));
-  }, []);
+  // Lazily fetch a folder's immediate children (memoized via childrenRef).
+  const loadChildren = useCallback(
+    async (path: string): Promise<FolderEntry[]> => {
+      if (childrenRef.current[path]) return childrenRef.current[path];
+      try {
+        const res = await fetch(
+          `${BACKEND_URL}/filing/folders?path=${encodeURIComponent(path)}`
+        );
+        if (!res.ok) return [];
+        const data = (await res.json()) as FolderEntry[];
+        childrenRef.current = { ...childrenRef.current, [path]: data };
+        setChildrenByPath(childrenRef.current);
+        return data;
+      } catch {
+        return [];
+      }
+    },
+    []
+  );
+
+  // Open the tree down to `target`, collapsing every branch not on its path.
+  const revealPath = useCallback(
+    async (target: string) => {
+      const segs = target.split("/").filter(Boolean); // ["Volumes","home",…]
+      const paths: string[] = [];
+      let cur = "";
+      for (const s of segs) {
+        cur += "/" + s;
+        paths.push(cur);
+      }
+      // Folders to expand: from the first level under the root down to the
+      // target's parent (root children are always shown; target is the leaf).
+      const toExpand = paths.slice(1, paths.length - 1);
+      await loadChildren(LIBRARY_ROOT);
+      for (const p of toExpand) await loadChildren(p);
+      setExpanded(new Set(toExpand));
+      setRevealedPath(target);
+    },
+    [loadChildren]
+  );
 
   const loadFiles = useCallback(async () => {
     try {
@@ -96,19 +129,10 @@ export function FilingTab() {
     }
   }, []);
 
-  const loadHierarchy = useCallback(async () => {
-    try {
-      const res = await fetch(`${BACKEND_URL}/filing/folder-hierarchy`);
-      if (res.ok) setHierarchy((await res.json()) as FolderHierarchy);
-    } catch {
-      // ignore
-    }
-  }, []);
-
   useEffect(() => {
     loadFiles();
-    loadHierarchy();
-  }, [loadFiles, loadHierarchy]);
+    loadChildren(LIBRARY_ROOT);
+  }, [loadFiles, loadChildren]);
 
   // Fetch suggestions for the selected file; reveal the top suggestion's path.
   useEffect(() => {
@@ -125,7 +149,7 @@ export function FilingTab() {
         if (!res.ok || cancelled) return;
         const data = (await res.json()) as SuggestionList;
         setSuggestions(data);
-        if (data.suggestions.length > 0) reveal(data.suggestions[0].folder_path);
+        if (data.suggestions.length > 0) revealPath(data.suggestions[0].folder_path);
         else setRevealedPath(null);
       } catch {
         if (!cancelled) setSuggestions(null);
@@ -134,7 +158,25 @@ export function FilingTab() {
     return () => {
       cancelled = true;
     };
-  }, [selectedId, reveal]);
+  }, [selectedId, revealPath]);
+
+  // Scroll the Library pane so the highlighted folder is centred. Runs after
+  // the revealed path's folders have loaded/rendered (childrenByPath dep).
+  useEffect(() => {
+    if (!revealedPath) return;
+    const container = treeRef.current;
+    if (!container) return;
+    const rows = Array.from(
+      container.querySelectorAll<HTMLElement>("[data-folder-path]")
+    );
+    const target = rows.find((r) => r.dataset.folderPath === revealedPath);
+    if (!target) return;
+    const cRect = container.getBoundingClientRect();
+    const tRect = target.getBoundingClientRect();
+    const delta =
+      tRect.top - cRect.top - container.clientHeight / 2 + tRect.height / 2;
+    container.scrollTop += delta;
+  }, [revealedPath, childrenByPath]);
 
   // OS drag & drop intake (desktop). Ingest endpoint is pending; a drop just
   // refreshes the queue for now.
@@ -255,14 +297,18 @@ export function FilingTab() {
     [onDragMove, onDragEnd]
   );
 
-  const toggleExpand = useCallback((path: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(path)) next.delete(path);
-      else next.add(path);
-      return next;
-    });
-  }, []);
+  const toggleExpand = useCallback(
+    (path: string) => {
+      setExpanded((prev) => {
+        const next = new Set(prev);
+        if (next.has(path)) next.delete(path);
+        else next.add(path);
+        return next;
+      });
+      if (!childrenRef.current[path]) loadChildren(path);
+    },
+    [loadChildren]
+  );
 
   const pending = files.filter((f) => f.status !== "ready").length;
   const selectedFile = files.find((f) => f.file_id === selectedId) ?? null;
@@ -368,7 +414,7 @@ export function FilingTab() {
                         didDragRef.current = false;
                         return;
                       }
-                      reveal(s.folder_path);
+                      revealPath(s.folder_path);
                     }}
                   >
                     <FolderIcon />
@@ -406,20 +452,27 @@ export function FilingTab() {
         <div className="pane library-pane">
           <div className="pane-header">
             <span className="pane-title">Library</span>
-            <span className="pane-meta">{tildeify(hierarchy?.root_path)}</span>
+            <span className="pane-meta">{LIBRARY_ROOT}</span>
           </div>
-          <div className="pane-body tree">
-            {hierarchy?.children.map((node) => (
-              <TreeNode
-                key={node.path}
-                node={node}
-                depth={0}
-                expanded={expanded}
-                revealedPath={revealedPath}
-                dropTarget={dropTarget}
-                onToggle={toggleExpand}
-              />
-            ))}
+          <div className="pane-body tree" ref={treeRef}>
+            {childrenByPath[LIBRARY_ROOT] === undefined ? (
+              <div className="pane-empty">Loading…</div>
+            ) : childrenByPath[LIBRARY_ROOT].length === 0 ? (
+              <div className="pane-empty">No folders found under {LIBRARY_ROOT}.</div>
+            ) : (
+              childrenByPath[LIBRARY_ROOT].map((node) => (
+                <TreeNode
+                  key={node.path}
+                  node={node}
+                  depth={0}
+                  expanded={expanded}
+                  revealedPath={revealedPath}
+                  dropTarget={dropTarget}
+                  childrenByPath={childrenByPath}
+                  onToggle={toggleExpand}
+                />
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -442,42 +495,39 @@ function TreeNode({
   expanded,
   revealedPath,
   dropTarget,
+  childrenByPath,
   onToggle,
 }: {
-  node: FolderNode;
+  node: FolderEntry;
   depth: number;
   expanded: Set<string>;
   revealedPath: string | null;
   dropTarget: string | null;
+  childrenByPath: Record<string, FolderEntry[]>;
   onToggle: (path: string) => void;
 }) {
-  const hasChildren = node.children.length > 0;
   const isOpen = expanded.has(node.path);
   const highlighted = node.path === revealedPath;
   const isDropTarget = node.path === dropTarget;
+  const kids = childrenByPath[node.path];
 
   return (
     <>
       <div
-        className={`tree-row${highlighted ? " highlight" : ""}${
+        className={`tree-row has-children${highlighted ? " highlight" : ""}${
           isDropTarget ? " drop-target" : ""
-        }${hasChildren ? " has-children" : ""}`}
+        }`}
         style={{ paddingLeft: 12 + depth * 18 }}
         data-folder-path={node.path}
-        onClick={() => hasChildren && onToggle(node.path)}
+        onClick={() => onToggle(node.path)}
       >
-        {hasChildren ? (
-          <ChevronIcon open={isOpen} />
-        ) : (
-          <span className="tree-chevron spacer" />
-        )}
+        <ChevronIcon open={isOpen} />
         <FolderIcon small />
         <span className="tree-name">{node.name}</span>
         {highlighted && <SparkleIcon />}
       </div>
-      {hasChildren &&
-        isOpen &&
-        node.children.map((child) => (
+      {isOpen &&
+        kids?.map((child) => (
           <TreeNode
             key={child.path}
             node={child}
@@ -485,6 +535,7 @@ function TreeNode({
             expanded={expanded}
             revealedPath={revealedPath}
             dropTarget={dropTarget}
+            childrenByPath={childrenByPath}
             onToggle={onToggle}
           />
         ))}
@@ -496,11 +547,6 @@ function confLevel(c: number): "high" | "med" | "low" {
   if (c >= 0.85) return "high";
   if (c >= 0.7) return "med";
   return "low";
-}
-
-function tildeify(path: string | undefined): string {
-  if (!path) return "";
-  return path.replace(/^\/Users\/[^/]+/, "~");
 }
 
 function FileStatusBadge({ status }: { status: FileStatus }) {
