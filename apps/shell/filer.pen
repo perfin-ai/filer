@@ -1396,6 +1396,8 @@
                   "id": "FoGhp",
                   "name": "Actions",
                   "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
                   "children": [
                     {
                       "type": "frame",
@@ -1419,6 +1421,16 @@
                           "fontWeight": "500"
                         }
                       ]
+                    },
+                    {
+                      "type": "icon",
+                      "id": "RXTDt",
+                      "name": "Spinner",
+                      "width": 18,
+                      "height": 18,
+                      "icon": "loader-circle",
+                      "library": "lucide",
+                      "fill": "#0a84ff"
                     }
                   ]
                 },

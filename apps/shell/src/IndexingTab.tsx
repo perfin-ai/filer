@@ -257,6 +257,9 @@ export function IndexingTab() {
         >
           {starting || inProgress ? "Indexing…" : "Start indexing"}
         </button>
+        {(starting || inProgress) && (
+          <span className="spinner" role="status" aria-label="Indexing in progress" />
+        )}
       </div>
 
       {startError && <p className="status err">Failed to start: {startError}</p>}
