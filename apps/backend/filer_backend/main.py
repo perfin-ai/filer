@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from filer_backend import __version__
+from filer_backend.api.filing import router as filing_router
 from filer_backend.api.health import router as health_router
 from filer_backend.api.index import router as index_router
 from filer_backend.migrations import run_migrations
@@ -25,6 +26,7 @@ def create_app() -> FastAPI:
     )
     app.include_router(health_router)
     app.include_router(index_router)
+    app.include_router(filing_router)
     return app
 
 
