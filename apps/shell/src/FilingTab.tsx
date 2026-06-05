@@ -396,9 +396,10 @@ export function FilingTab() {
       window.removeEventListener("pointermove", onDragMove);
       window.removeEventListener("pointerup", onDragEnd);
       window.removeEventListener("pointercancel", onDragEnd);
-      // Re-enable text selection.
+      // Re-enable text selection and pane scrolling.
       document.body.style.removeProperty("user-select");
       document.body.style.removeProperty("-webkit-user-select");
+      document.body.classList.remove("dragging-no-scroll");
       const src = dragSrcRef.current;
       const wasDrag = didDragRef.current;
       dragSrcRef.current = null;
@@ -418,9 +419,11 @@ export function FilingTab() {
       dragSrcRef.current = { fileId: file.file_id, filename: file.filename };
       dragStartRef.current = { x: e.clientX, y: e.clientY };
       didDragRef.current = false;
-      // Suppress page-wide text selection while the pointer is down.
+      // Suppress page-wide text selection and freeze pane scrolling while the
+      // pointer is down (so dragging over a list doesn't scroll it).
       document.body.style.setProperty("user-select", "none");
       document.body.style.setProperty("-webkit-user-select", "none");
+      document.body.classList.add("dragging-no-scroll");
       window.getSelection()?.removeAllRanges();
       window.addEventListener("pointermove", onDragMove);
       window.addEventListener("pointerup", onDragEnd);

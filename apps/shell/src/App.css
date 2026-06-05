@@ -622,6 +622,12 @@ html,
   opacity: 1;
 }
 
+/* Freeze scrolling while a file/suggestion is being dragged onto a folder. */
+body.dragging-no-scroll .pane-body,
+body.dragging-no-scroll .content {
+  overflow: hidden;
+}
+
 button.primary {
   background: #0a84ff;
   color: #fff;
