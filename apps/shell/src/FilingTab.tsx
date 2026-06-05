@@ -48,6 +48,15 @@ type FsEntry = {
 // The Library tree is rooted here and read lazily from the real filesystem.
 const LIBRARY_ROOT = "/Volumes";
 
+type BatchProgress = {
+  batch_id: string;
+  status: string;
+  files_total: number;
+  files_processed: number;
+};
+
+const BATCH_TERMINAL: ReadonlySet<string> = new Set(["success", "failure"]);
+
 export function FilingTab() {
   const [files, setFiles] = useState<UnfiledFile[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -58,6 +67,8 @@ export function FilingTab() {
   const childrenRef = useRef<Record<string, FsEntry[]>>({});
   const [dragging, setDragging] = useState(false);
   const [accepting, setAccepting] = useState<string | null>(null);
+  const [batch, setBatch] = useState<BatchProgress | null>(null);
+  const batchEsRef = useRef<EventSource | null>(null);
 
   // Library-tree interaction state.
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -134,10 +145,64 @@ export function FilingTab() {
     }
   }, []);
 
+  // Subscribe to a drop batch's progress; refresh the queue as files turn ready.
+  const subscribeBatch = useCallback(
+    (batchId: string) => {
+      batchEsRef.current?.close();
+      const es = new EventSource(`${BACKEND_URL}/filing/jobs/${batchId}/events`);
+      batchEsRef.current = es;
+      es.addEventListener("progress", (ev) => {
+        try {
+          const data = JSON.parse((ev as MessageEvent).data) as BatchProgress;
+          setBatch(data);
+          loadFiles();
+          if (BATCH_TERMINAL.has(data.status)) {
+            es.close();
+            batchEsRef.current = null;
+          }
+        } catch {
+          // ignore parse errors
+        }
+      });
+      es.onerror = () => {
+        // Browser closes on terminal status; nothing to do.
+      };
+    },
+    [loadFiles]
+  );
+
+  // Send dropped/chosen paths to the backend for processing.
+  const startIngest = useCallback(
+    async (paths: string[]) => {
+      if (paths.length === 0) return;
+      try {
+        const res = await fetch(`${BACKEND_URL}/filing/ingest`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paths }),
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as BatchProgress;
+        setBatch(data);
+        subscribeBatch(data.batch_id);
+      } catch {
+        // backend unreachable
+      }
+    },
+    [subscribeBatch]
+  );
+
   useEffect(() => {
     loadFiles();
     loadChildren(LIBRARY_ROOT);
   }, [loadFiles, loadChildren]);
+
+  useEffect(() => {
+    return () => {
+      batchEsRef.current?.close();
+      batchEsRef.current = null;
+    };
+  }, []);
 
   // Fetch suggestions for the selected file; reveal the top suggestion's path.
   useEffect(() => {
@@ -183,8 +248,7 @@ export function FilingTab() {
     container.scrollTop += delta;
   }, [revealedPath, childrenByPath]);
 
-  // OS drag & drop intake (desktop). Ingest endpoint is pending; a drop just
-  // refreshes the queue for now.
+  // OS drag & drop intake (desktop): send dropped folder/file paths to ingest.
   useEffect(() => {
     if (!IS_TAURI) return;
     let unlisten: (() => void) | undefined;
@@ -196,7 +260,7 @@ export function FilingTab() {
         else if (p.type === "leave") setDragging(false);
         else if (p.type === "drop") {
           setDragging(false);
-          loadFiles();
+          if (p.paths?.length) startIngest(p.paths);
         }
       })
       .then((un) => {
@@ -207,13 +271,14 @@ export function FilingTab() {
       cancelled = true;
       unlisten?.();
     };
-  }, [loadFiles]);
+  }, [startIngest]);
 
   const choose = useCallback(async () => {
     if (!IS_TAURI) return;
     const selected = await open({ directory: false, multiple: true });
-    if (selected) loadFiles();
-  }, [loadFiles]);
+    const paths = Array.isArray(selected) ? selected : selected ? [selected] : [];
+    if (paths.length) startIngest(paths);
+  }, [startIngest]);
 
   // Remove a filed file from the queue and advance selection.
   const dropFromQueue = useCallback((fileId: string) => {
@@ -238,6 +303,23 @@ export function FilingTab() {
         // ignore
       } finally {
         setAccepting(null);
+      }
+    },
+    [dropFromQueue]
+  );
+
+  // File a dropped document into a library folder, then drop it from the queue.
+  const fileInto = useCallback(
+    async (fileId: string, folderPath: string) => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/filing/files/${fileId}/file`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ folder_path: folderPath }),
+        });
+        if (res.ok) dropFromQueue(fileId);
+      } catch {
+        // ignore
       }
     },
     [dropFromQueue]
@@ -278,11 +360,9 @@ export function FilingTab() {
       setDropTarget(null);
       if (!wasDrag || !src) return;
       const target = folderPathAt(e.clientX, e.clientY);
-      // TODO: call POST /filing/files/{id}/file to actually file it. For now
-      // just confirm the drag wiring with an alert showing source → target.
-      if (target) window.alert(`File "${src.filename}" → folder "${target}"`);
+      if (target) fileInto(src.fileId, target);
     },
-    [onDragMove]
+    [onDragMove, fileInto]
   );
 
   const startFileDrag = useCallback(
@@ -315,7 +395,6 @@ export function FilingTab() {
     [loadChildren]
   );
 
-  const pending = files.filter((f) => f.status !== "ready").length;
   const selectedFile = files.find((f) => f.file_id === selectedId) ?? null;
 
   return (
@@ -341,11 +420,13 @@ export function FilingTab() {
         </div>
       </div>
 
-      {pending > 0 && (
+      {batch && !BATCH_TERMINAL.has(batch.status) && (
         <div className="filing-status">
           <span className="spinner" />
           <span>
-            Processing {pending} of {files.length} files…
+            {batch.files_total > 0
+              ? `Processing ${batch.files_processed} of ${batch.files_total} files…`
+              : "Processing dropped files…"}
           </span>
         </div>
       )}
