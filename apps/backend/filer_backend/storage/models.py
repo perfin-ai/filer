@@ -81,6 +81,7 @@ class InboxFile(Base):
     mime_type: Mapped[str | None] = mapped_column(String, nullable=True)
     size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False, default=0)
     kind: Mapped[str] = mapped_column(String, nullable=False, default="other")
+    modified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     content_hash: Mapped[str | None] = mapped_column(String, nullable=True)
     status: Mapped[str] = mapped_column(String, nullable=False, default="queued")
     error: Mapped[str | None] = mapped_column(String, nullable=True)

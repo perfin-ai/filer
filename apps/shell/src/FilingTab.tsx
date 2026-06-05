@@ -20,7 +20,15 @@ type UnfiledFile = {
   kind: FileKind;
   status: FileStatus;
   added_at: string;
+  modified_at: string | null;
   suggestion_count: number;
+};
+
+type SortKey = "name" | "modified" | "kind";
+const SORT_LABELS: Record<SortKey, string> = {
+  name: "Name",
+  modified: "Modified",
+  kind: "Type",
 };
 
 type Suggestion = {
@@ -67,6 +75,8 @@ export function FilingTab() {
   const childrenRef = useRef<Record<string, FsEntry[]>>({});
   const [dragging, setDragging] = useState(false);
   const [accepting, setAccepting] = useState<string | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey>("name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [batch, setBatch] = useState<BatchProgress | null>(null);
   const batchEsRef = useRef<EventSource | null>(null);
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; text: string } | null>(
@@ -447,6 +457,40 @@ export function FilingTab() {
 
   const selectedFile = files.find((f) => f.file_id === selectedId) ?? null;
 
+  // Re-clicking the active key flips direction; switching key picks a default.
+  const changeSort = (key: SortKey) => {
+    if (key === sortKey) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir(key === "modified" ? "desc" : "asc");
+    }
+  };
+
+  // Sort only the ready files; keep queued/processing grouped below them.
+  const compareReady = (a: UnfiledFile, b: UnfiledFile): number => {
+    if (sortKey === "modified") {
+      const av = a.modified_at ? Date.parse(a.modified_at) : null;
+      const bv = b.modified_at ? Date.parse(b.modified_at) : null;
+      // Files without a known modified date always sort last.
+      if (av === null || bv === null) {
+        if (av === bv) return 0;
+        return av === null ? 1 : -1;
+      }
+      return sortDir === "asc" ? av - bv : bv - av;
+    }
+    let r: number;
+    if (sortKey === "name") {
+      r = a.filename.localeCompare(b.filename, undefined, { sensitivity: "base" });
+    } else {
+      r = a.kind.localeCompare(b.kind) || a.filename.localeCompare(b.filename);
+    }
+    return sortDir === "asc" ? r : -r;
+  };
+  const readyFiles = files.filter((f) => f.status === "ready").sort(compareReady);
+  const otherFiles = files.filter((f) => f.status !== "ready");
+  const orderedFiles = [...readyFiles, ...otherFiles];
+
   return (
     <section className="panel filing">
       <h2>Filing</h2>
@@ -485,14 +529,27 @@ export function FilingTab() {
         <div className="work-left">
           <div className="pane file-pane">
             <div className="pane-header">
-              <span className="pane-title">Files</span>
-              <span className="pane-meta">{files.length} in queue</span>
+              <span className="pane-title">
+                Files <span className="pane-count">({files.length})</span>
+              </span>
+              <div className="sort-controls" title="Sort ready files">
+                {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
+                  <button
+                    key={k}
+                    className={`sort-btn${sortKey === k ? " active" : ""}`}
+                    onClick={() => changeSort(k)}
+                  >
+                    {SORT_LABELS[k]}
+                    {sortKey === k ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
+                  </button>
+                ))}
+              </div>
             </div>
             <ul className="pane-body file-list">
               {files.length === 0 && (
                 <li className="pane-empty">No files waiting to be filed.</li>
               )}
-              {files.map((f) => (
+              {orderedFiles.map((f) => (
                 <li
                   key={f.file_id}
                   className={`file-row${f.file_id === selectedId ? " selected" : ""}`}

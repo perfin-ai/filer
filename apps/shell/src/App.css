@@ -259,6 +259,38 @@ html,
   text-overflow: ellipsis;
 }
 
+.pane-count {
+  color: #8a8a8e;
+  font-weight: 400;
+}
+
+.sort-controls {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.sort-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  color: #8a8a8e;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+
+.sort-btn:hover {
+  color: #1c1c1e;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.sort-btn.active {
+  color: #0a84ff;
+  font-weight: 600;
+}
+
 .pane-body {
   flex: 1;
   min-height: 0;
@@ -929,6 +961,10 @@ button.primary:disabled {
   .file-name,
   .tree-name {
     color: #aeaeb2;
+  }
+  .sort-btn:hover {
+    color: #f2f2f7;
+    background: rgba(255, 255, 255, 0.08);
   }
   .file-row.selected .file-name,
   .sug-folder {

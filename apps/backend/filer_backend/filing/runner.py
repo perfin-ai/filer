@@ -40,7 +40,7 @@ def _update_batch(s: Session, batch_id: str, **updates) -> None:
 
 
 def _enumerate(paths: list[str]):
-    """Yield (Path, size_bytes) for each regular file in the dropped paths."""
+    """Yield (Path, os.stat_result) for each regular file in the dropped paths."""
     for raw in paths:
         p = Path(raw)
         try:
@@ -48,10 +48,9 @@ def _enumerate(paths: list[str]):
         except OSError:
             continue
         if p.is_dir():
-            for fp, fst in iter_files(p):
-                yield fp, fst.st_size
+            yield from iter_files(p)
         elif p.is_file():
-            yield p, st.st_size
+            yield p, st
 
 
 def _process_one(s: Session, file_id: str) -> None:
@@ -104,7 +103,7 @@ def run_ingest(paths: list[str], batch_id: str) -> dict:
         _update_batch(s, batch_id, status="running", stage="scanning")
         s.commit()
 
-        for fp, size in _enumerate(paths):
+        for fp, st in _enumerate(paths):
             ap = str(fp)
             if ap in seen:
                 continue
@@ -125,8 +124,9 @@ def run_ingest(paths: list[str], batch_id: str) -> dict:
                     filename=fp.name,
                     extension=fp.suffix.lstrip(".") or None,
                     mime_type=mimetypes.guess_type(fp.name)[0],
-                    size_bytes=size,
+                    size_bytes=st.st_size,
                     kind=kind_for(fp.name),
+                    modified_at=datetime.fromtimestamp(st.st_mtime, tz=timezone.utc),
                     status="queued",
                     added_at=_now(),
                 )

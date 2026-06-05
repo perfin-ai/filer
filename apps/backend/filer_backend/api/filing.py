@@ -71,6 +71,7 @@ class UnfiledFile(BaseModel):
     kind: FileKind
     status: FileStatus
     added_at: datetime
+    modified_at: datetime | None = None
     suggestion_count: int = 0
 
 
@@ -137,6 +138,7 @@ def _unfiled(rec: InboxFile, suggestion_count: int) -> UnfiledFile:
         kind=rec.kind,  # type: ignore[arg-type]
         status=rec.status,  # type: ignore[arg-type]
         added_at=_utc(rec.added_at),
+        modified_at=_utc(rec.modified_at),
         suggestion_count=suggestion_count,
     )
 
@@ -331,6 +333,19 @@ def list_unfiled_files() -> list[UnfiledFile]:
             .scalars()
             .all()
         )
+        # Backfill modified_at for rows ingested before it was captured, so the
+        # "Modified" sort works on files already in the queue.
+        dirty = False
+        for r in rows:
+            if r.modified_at is None:
+                try:
+                    mtime = os.stat(r.absolute_path).st_mtime
+                    r.modified_at = datetime.fromtimestamp(mtime, tz=timezone.utc)
+                    dirty = True
+                except OSError:
+                    pass
+        if dirty:
+            s.commit()
         counts = dict(
             s.execute(
                 select(FilingSuggestion.inbox_file_id, func.count()).group_by(
