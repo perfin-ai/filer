@@ -69,6 +69,10 @@ export function FilingTab() {
   const [accepting, setAccepting] = useState<string | null>(null);
   const [batch, setBatch] = useState<BatchProgress | null>(null);
   const batchEsRef = useRef<EventSource | null>(null);
+  const [flash, setFlash] = useState<{ kind: "ok" | "err"; text: string } | null>(
+    null
+  );
+  const flashTimer = useRef<number | null>(null);
 
   // Library-tree interaction state.
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -280,6 +284,31 @@ export function FilingTab() {
     if (paths.length) startIngest(paths);
   }, [startIngest]);
 
+  const dismissFlash = useCallback(() => {
+    if (flashTimer.current) window.clearTimeout(flashTimer.current);
+    flashTimer.current = null;
+    setFlash(null);
+  }, []);
+
+  // Show a success/error toast. Errors stay until dismissed; successes auto-hide.
+  const showFlash = useCallback((kind: "ok" | "err", text: string) => {
+    setFlash({ kind, text });
+    if (flashTimer.current) window.clearTimeout(flashTimer.current);
+    flashTimer.current =
+      kind === "ok" ? window.setTimeout(() => setFlash(null), 4000) : null;
+  }, []);
+
+  // Pull `detail` out of an error response (falls back to the status code).
+  const errorDetail = async (res: Response): Promise<string> => {
+    try {
+      const body = await res.json();
+      if (body?.detail) return String(body.detail);
+    } catch {
+      /* ignore */
+    }
+    return `HTTP ${res.status}`;
+  };
+
   // Remove a filed file from the queue and advance selection.
   const dropFromQueue = useCallback((fileId: string) => {
     setFiles((prev) => {
@@ -298,14 +327,23 @@ export function FilingTab() {
           `${BACKEND_URL}/filing/files/${fileId}/suggestions/${suggestionId}/accept`,
           { method: "POST" }
         );
-        if (res.ok) dropFromQueue(fileId);
-      } catch {
-        // ignore
+        if (res.ok) {
+          const data = await res.json();
+          dropFromQueue(fileId);
+          const parts = String(data.moved_to).split("/");
+          const name = parts[parts.length - 1];
+          const folder = parts[parts.length - 2] ?? "";
+          showFlash("ok", `Filed “${name}” → ${folder}`);
+        } else {
+          showFlash("err", `Couldn’t file: ${await errorDetail(res)}`);
+        }
+      } catch (e) {
+        showFlash("err", `Couldn’t file: ${String(e)}`);
       } finally {
         setAccepting(null);
       }
     },
-    [dropFromQueue]
+    [dropFromQueue, showFlash]
   );
 
   // File a dropped document into a library folder, then drop it from the queue.
@@ -317,12 +355,21 @@ export function FilingTab() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ folder_path: folderPath }),
         });
-        if (res.ok) dropFromQueue(fileId);
-      } catch {
-        // ignore
+        if (res.ok) {
+          const data = await res.json();
+          dropFromQueue(fileId);
+          const parts = String(data.moved_to).split("/");
+          const name = parts[parts.length - 1];
+          const folder = parts[parts.length - 2] ?? "";
+          showFlash("ok", `Filed “${name}” → ${folder}`);
+        } else {
+          showFlash("err", `Couldn’t file: ${await errorDetail(res)}`);
+        }
+      } catch (e) {
+        showFlash("err", `Couldn’t file: ${String(e)}`);
       }
     },
-    [dropFromQueue]
+    [dropFromQueue, showFlash]
   );
 
   // Resolve the folder path under a screen point (null if not over a folder).
@@ -571,6 +618,19 @@ export function FilingTab() {
           style={{ left: ghost.x + 14, top: ghost.y + 12 }}
         >
           {ghost.filename}
+        </div>
+      )}
+
+      {flash && (
+        <div className={`flash-toast ${flash.kind}`} role="status">
+          <span className="flash-text">{flash.text}</span>
+          <button
+            className="flash-close"
+            aria-label="Dismiss"
+            onClick={dismissFlash}
+          >
+            ×
+          </button>
         </div>
       )}
     </section>

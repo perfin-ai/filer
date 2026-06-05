@@ -14,7 +14,9 @@ suggestion engine itself is still a stub (filing/suggester.py).
 """
 
 import asyncio
+import errno
 import json
+import os
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -139,6 +141,67 @@ def _unfiled(rec: InboxFile, suggestion_count: int) -> UnfiledFile:
     )
 
 
+def _oserr(e: OSError) -> str:
+    code = errno.errorcode.get(e.errno or 0, str(e.errno))
+    return f"[{code}] {e.strerror or e}"
+
+
+def _safe_unlink(p: Path) -> bool:
+    try:
+        p.unlink()
+        return True
+    except OSError:
+        return False
+
+
+def _relocate(src: Path, dest: Path) -> None:
+    """Move src -> dest, robustly across filesystems and network shares.
+
+    Phases (each surfaced distinctly): atomic rename fast-path; else copy the
+    bytes, copy metadata best-effort (SMB/AFP reject some with EINVAL — the data
+    is already there, so ignore), then remove the original. If the original
+    can't be removed, roll back the copy so the move is all-or-nothing and we
+    never leave a duplicate.
+    """
+    # 1. Fast path: atomic rename on the same filesystem.
+    try:
+        os.replace(src, dest)
+        return
+    except OSError as e:
+        if e.errno not in (errno.EXDEV, errno.EINVAL, errno.ENOTSUP):
+            raise HTTPException(
+                status_code=409, detail=f"could not move file (rename): {_oserr(e)}"
+            )
+
+    # 2. Cross-filesystem: copy the bytes.
+    try:
+        shutil.copyfile(src, dest)
+    except OSError as e:
+        _safe_unlink(dest)
+        raise HTTPException(
+            status_code=409, detail=f"could not copy to destination: {_oserr(e)}"
+        )
+
+    # 3. Metadata is best-effort (network shares often reject it with EINVAL).
+    try:
+        shutil.copystat(src, dest)
+    except OSError:
+        pass
+
+    # 4. Remove the original to complete the move.
+    try:
+        os.remove(src)
+    except OSError as e:
+        rolled_back = _safe_unlink(dest)
+        detail = f"copied to destination but could not remove the original: {_oserr(e)}"
+        detail += (
+            " (rolled back)"
+            if rolled_back
+            else " (warning: a copy may remain at the destination)"
+        )
+        raise HTTPException(status_code=409, detail=detail)
+
+
 def _unique_dest(dest_dir: Path, name: str) -> Path:
     cand = dest_dir / name
     if not cand.exists():
@@ -164,10 +227,9 @@ def _move_into(s, rec: InboxFile, folder_path: str, accepted: bool) -> str:
     try:
         dest_dir.mkdir(parents=True, exist_ok=True)
         dest = _unique_dest(dest_dir, src.name)
-        shutil.move(str(src), str(dest))
     except OSError as e:
-        # e.g. EPERM on TCC-gated /Volumes network shares.
-        raise HTTPException(status_code=409, detail=f"move failed: {e}")
+        raise HTTPException(status_code=409, detail=f"cannot prepare destination: {e}")
+    _relocate(src, dest)
     now = datetime.now(timezone.utc)
     s.add(
         FilingAction(

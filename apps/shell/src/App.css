@@ -575,6 +575,53 @@ html,
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
 
+.flash-toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1001;
+  max-width: 420px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 10px 10px 14px;
+  font-size: 13px;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+}
+
+.flash-toast.ok {
+  background: #1f9d4d;
+}
+
+.flash-toast.err {
+  background: #d23b30;
+}
+
+.flash-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.flash-close {
+  flex: none;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.flash-close:hover {
+  opacity: 1;
+}
+
 button.primary {
   background: #0a84ff;
   color: #fff;
