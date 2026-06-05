@@ -1,33 +1,66 @@
 """Filing endpoints.
 
-Serves the Filing screen: unfiled files awaiting organization, per-file
-folder suggestions, accepting a suggestion, and the destination folder
-hierarchy.
+Serves the Filing screen end-to-end:
+- POST /filing/ingest          — accept dropped folder/files, enqueue processing
+- GET  /filing/jobs/{id}/events— SSE batch progress ("Processing N of M")
+- GET  /filing/files/unfiled   — inbox queue (DB-backed)
+- GET  /filing/files/{id}/suggestions
+- POST /filing/files/{id}/suggestions/{sid}/accept — move into the suggested folder
+- POST /filing/files/{id}/file — move into an arbitrary folder (drag-and-drop)
+- GET  /filing/entries         — lazy real-filesystem listing for the Library tree
 
-The unfiled queue and the per-file accept/processing flow are still mock
-data (to be replaced by Celery + a suggestion model). The folder tree
-(`GET /folders`) reads the real filesystem under /Volumes, lazily one
-level at a time, and suggestions point at real folder paths.
+Files are processed one-by-one by a Celery task (see filing/runner.py). The
+suggestion engine itself is still a stub (filing/suggester.py).
 """
 
-import os
-import random
+import asyncio
+import json
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
+from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from sqlalchemy import func, select
+from sse_starlette.sse import EventSourceResponse
+
+from filer_backend.filing.fs import FileKind, FsEntry, LIBRARY_ROOT, list_entries
+from filer_backend.filing.tasks import ingest_files_task
+from filer_backend.storage.db import get_session
+from filer_backend.storage.models import (
+    FilingAction,
+    FilingBatch,
+    FilingSuggestion,
+    InboxFile,
+)
 
 router = APIRouter(prefix="/filing", tags=["filing"])
 
-FileStatus = Literal["queued", "processing", "ready", "filed"]
-FileKind = Literal["pdf", "image", "document", "spreadsheet", "other"]
+POLL_INTERVAL_S = 0.5
+TERMINAL_STATUSES = {"success", "failure"}
+
+FileStatus = Literal["queued", "processing", "ready", "filed", "failed"]
 
 
 # --------------------------------------------------------------------------- #
-# Response models
+# Models
 # --------------------------------------------------------------------------- #
+class IngestRequest(BaseModel):
+    paths: list[str] = Field(..., min_length=1)
+
+
+class FilingBatchResponse(BaseModel):
+    batch_id: str
+    status: str
+    stage: str | None = None
+    files_total: int = 0
+    files_processed: int = 0
+    files_failed: int = 0
+    error: str | None = None
+
+
 class UnfiledFile(BaseModel):
     file_id: str
     filename: str
@@ -44,7 +77,7 @@ class Suggestion(BaseModel):
     folder_name: str
     folder_path: str
     absolute_path: str
-    confidence: float  # 0.0 – 1.0
+    confidence: float
     rationale: str | None = None
 
 
@@ -72,262 +105,215 @@ class FiledResult(BaseModel):
     moved_to: str
 
 
-class FsEntry(BaseModel):
-    name: str
-    path: str
-    is_dir: bool
-    kind: FileKind | None = None  # set for files, used to pick an icon
-
-
 # --------------------------------------------------------------------------- #
-# Mock data + real-filesystem config
+# Helpers
 # --------------------------------------------------------------------------- #
-_DROP_ROOT = "/Users/ericmelz/Downloads/to-file"
-# The library is the real filesystem rooted here; the tree is read lazily.
-_LIBRARY_ROOT = "/Volumes"
-# The top suggestion always points at this real folder.
-_RECORDS_FOLDER = (
-    "/Volumes/home/_Documents/_Records/_By Year/_2026/"
-    "Banking/Credit/Fidelity/Visa 6665/Documents"
-)
+def _utc(dt: datetime | None) -> datetime | None:
+    if dt is not None and dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
 
 
-def _ts(day: int, hour: int, minute: int) -> datetime:
-    return datetime(2026, 6, day, hour, minute, tzinfo=timezone.utc)
-
-
-_FILES: list[UnfiledFile] = [
-    UnfiledFile(
-        file_id="f_invoice_q1",
-        filename="invoice_q1_2026.pdf",
-        absolute_path=f"{_DROP_ROOT}/invoice_q1_2026.pdf",
-        size_bytes=248_120,
-        kind="pdf",
-        status="ready",
-        added_at=_ts(4, 9, 38),
-        suggestion_count=3,
-    ),
-    UnfiledFile(
-        file_id="f_scan_0314",
-        filename="scan_2026_03_14.jpg",
-        absolute_path=f"{_DROP_ROOT}/scan_2026_03_14.jpg",
-        size_bytes=1_905_544,
-        kind="image",
-        status="ready",
-        added_at=_ts(4, 9, 38),
-        suggestion_count=2,
-    ),
-    UnfiledFile(
-        file_id="f_meeting_notes",
-        filename="meeting_notes.docx",
-        absolute_path=f"{_DROP_ROOT}/meeting_notes.docx",
-        size_bytes=34_210,
-        kind="document",
-        status="ready",
-        added_at=_ts(4, 9, 39),
-        suggestion_count=2,
-    ),
-    UnfiledFile(
-        file_id="f_receipt_amazon",
-        filename="receipt_amazon.pdf",
-        absolute_path=f"{_DROP_ROOT}/receipt_amazon.pdf",
-        size_bytes=88_400,
-        kind="pdf",
-        status="ready",
-        added_at=_ts(4, 9, 39),
-        suggestion_count=2,
-    ),
-    UnfiledFile(
-        file_id="f_img_4821",
-        filename="IMG_4821.png",
-        absolute_path=f"{_DROP_ROOT}/IMG_4821.png",
-        size_bytes=3_201_998,
-        kind="image",
-        status="processing",
-        added_at=_ts(4, 9, 40),
-        suggestion_count=0,
-    ),
-    UnfiledFile(
-        file_id="f_budget_v2",
-        filename="budget_v2.xlsx",
-        absolute_path=f"{_DROP_ROOT}/budget_v2.xlsx",
-        size_bytes=51_770,
-        kind="spreadsheet",
-        status="queued",
-        added_at=_ts(4, 9, 40),
-        suggestion_count=0,
-    ),
-    UnfiledFile(
-        file_id="f_contract_draft",
-        filename="contract_draft.pdf",
-        absolute_path=f"{_DROP_ROOT}/contract_draft.pdf",
-        size_bytes=176_300,
-        kind="pdf",
-        status="queued",
-        added_at=_ts(4, 9, 41),
-        suggestion_count=0,
-    ),
-]
-
-_FILES_BY_ID: dict[str, UnfiledFile] = {f.file_id: f for f in _FILES}
-
-
-def _list_subdirs(path: Path) -> list[Path]:
-    """Immediate subdirectories of `path`, sorted; [] on any access error.
-
-    Skips dotfiles and symlinks (the latter avoids loops and the
-    /Volumes/Macintosh HD -> / link). Errors (incl. EPERM on TCC-gated
-    network volumes) degrade gracefully to an empty list.
-    """
-    try:
-        entries = []
-        with os.scandir(path) as it:
-            for e in it:
-                if e.name.startswith("."):
-                    continue
-                try:
-                    if e.is_dir(follow_symlinks=False):
-                        entries.append(Path(e.path))
-                except OSError:
-                    continue
-        entries.sort(key=lambda p: p.name.lower())
-        return entries
-    except OSError:
-        return []
-
-
-_KIND_BY_EXT: dict[str, FileKind] = {
-    "pdf": "pdf",
-    "png": "image", "jpg": "image", "jpeg": "image", "gif": "image",
-    "heic": "image", "webp": "image", "tiff": "image", "bmp": "image", "svg": "image",
-    "doc": "document", "docx": "document", "txt": "document", "rtf": "document",
-    "md": "document", "pages": "document", "odt": "document",
-    "xls": "spreadsheet", "xlsx": "spreadsheet", "csv": "spreadsheet",
-    "numbers": "spreadsheet", "ods": "spreadsheet",
-}
-
-
-def _kind(name: str) -> FileKind:
-    ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""
-    return _KIND_BY_EXT.get(ext, "other")
-
-
-def _list_entries(path: Path) -> list[FsEntry]:
-    """Subfolders (first) then files of `path`; [] on any access error.
-
-    Skips dotfiles and symlinks. Files carry a `kind` for icon selection.
-    """
-    try:
-        dirs: list[FsEntry] = []
-        files: list[FsEntry] = []
-        with os.scandir(path) as it:
-            for e in it:
-                if e.name.startswith("."):
-                    continue
-                try:
-                    if e.is_dir(follow_symlinks=False):
-                        dirs.append(FsEntry(name=e.name, path=e.path, is_dir=True))
-                    elif e.is_file(follow_symlinks=False):
-                        files.append(
-                            FsEntry(
-                                name=e.name,
-                                path=e.path,
-                                is_dir=False,
-                                kind=_kind(e.name),
-                            )
-                        )
-                except OSError:
-                    continue
-        dirs.sort(key=lambda x: x.name.lower())
-        files.sort(key=lambda x: x.name.lower())
-        return dirs + files
-    except OSError:
-        return []
-
-
-def _random_dirs(n: int) -> list[str]:
-    """Pick `n` distinct real folders by random-walking down from the root."""
-    out: list[str] = []
-    seen: set[str] = set()
-    for _ in range(n * 8):
-        if len(out) >= n:
-            break
-        cur = Path(_LIBRARY_ROOT)
-        for _ in range(random.randint(1, 4)):
-            subs = _list_subdirs(cur)
-            if not subs:
-                break
-            cur = random.choice(subs)
-        s = str(cur)
-        if s != _LIBRARY_ROOT and s != _RECORDS_FOLDER and s not in seen:
-            seen.add(s)
-            out.append(s)
-    return out
-
-
-def _suggestion(sid: str, path: str, confidence: float, rationale: str) -> Suggestion:
-    return Suggestion(
-        suggestion_id=sid,
-        folder_name=Path(path).name,
-        folder_path=path,
-        absolute_path=path,
-        confidence=confidence,
-        rationale=rationale,
+def _batch_response(b: FilingBatch) -> FilingBatchResponse:
+    return FilingBatchResponse(
+        batch_id=b.id,
+        status=b.status,
+        stage=b.stage,
+        files_total=b.files_total,
+        files_processed=b.files_processed,
+        files_failed=b.files_failed,
+        error=b.error,
     )
 
 
-# Generated suggestions are memoized per file so accept/drag can resolve the
-# same ids the listing returned (the random folders stay stable per session).
-_suggestion_cache: dict[str, list[Suggestion]] = {}
+def _unfiled(rec: InboxFile, suggestion_count: int) -> UnfiledFile:
+    return UnfiledFile(
+        file_id=rec.id,
+        filename=rec.filename,
+        absolute_path=rec.absolute_path,
+        size_bytes=rec.size_bytes,
+        kind=rec.kind,  # type: ignore[arg-type]
+        status=rec.status,  # type: ignore[arg-type]
+        added_at=_utc(rec.added_at),
+        suggestion_count=suggestion_count,
+    )
 
 
-def _build_suggestions(file_id: str) -> list[Suggestion]:
-    if file_id in _suggestion_cache:
-        return _suggestion_cache[file_id]
-    suggestions = [
-        _suggestion(
-            "s_records",
-            _RECORDS_FOLDER,
-            0.94,
-            "Matches your Records filing for Fidelity Visa statements.",
+def _unique_dest(dest_dir: Path, name: str) -> Path:
+    cand = dest_dir / name
+    if not cand.exists():
+        return cand
+    stem, suffix = cand.stem, cand.suffix
+    i = 1
+    while True:
+        alt = dest_dir / f"{stem} ({i}){suffix}"
+        if not alt.exists():
+            return alt
+        i += 1
+
+
+def _move_into(s, rec: InboxFile, folder_path: str, accepted: bool) -> str:
+    """Move the inbox file into `folder_path`, record the action, mark filed."""
+    folder = folder_path.strip().rstrip("/")
+    if not folder:
+        raise HTTPException(status_code=400, detail="folder_path is required")
+    src = Path(rec.absolute_path)
+    if not src.exists():
+        raise HTTPException(status_code=409, detail=f"source file is gone: {src}")
+    dest_dir = Path(folder)
+    try:
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        dest = _unique_dest(dest_dir, src.name)
+        shutil.move(str(src), str(dest))
+    except OSError as e:
+        # e.g. EPERM on TCC-gated /Volumes network shares.
+        raise HTTPException(status_code=409, detail=f"move failed: {e}")
+    now = datetime.now(timezone.utc)
+    s.add(
+        FilingAction(
+            inbox_file_id=rec.id,
+            source_path=str(src),
+            destination_path=str(dest),
+            accepted_suggestion=accepted,
+            moved_at=now,
         )
-    ]
-    for i, folder in enumerate(_random_dirs(2)):
-        suggestions.append(
-            _suggestion(
-                f"s_rand_{i}",
-                folder,
-                round(random.uniform(0.45, 0.82), 2),
-                "Another folder on this system.",
-            )
-        )
-    _suggestion_cache[file_id] = suggestions
-    return suggestions
+    )
+    rec.status = "filed"
+    rec.filed_to = str(dest)
+    rec.absolute_path = str(dest)
+    rec.processed_at = now
+    s.commit()
+    return str(dest)
 
 
 # --------------------------------------------------------------------------- #
 # Endpoints
 # --------------------------------------------------------------------------- #
+@router.post("/ingest", response_model=FilingBatchResponse)
+def ingest(req: IngestRequest) -> FilingBatchResponse:
+    """Accept dropped folder/files and enqueue one-by-one processing."""
+    valid = [p for p in req.paths if Path(p).expanduser().exists()]
+    if not valid:
+        raise HTTPException(status_code=400, detail="no existing paths provided")
+    valid = [str(Path(p).expanduser()) for p in valid]
+
+    batch_id = uuid4().hex
+    now = datetime.now(timezone.utc)
+    s = get_session()
+    try:
+        batch = FilingBatch(
+            id=batch_id, status="pending", created_at=now, updated_at=now
+        )
+        s.add(batch)
+        s.commit()
+        response = _batch_response(batch)
+    finally:
+        s.close()
+
+    ingest_files_task.apply_async(args=[valid, batch_id], task_id=batch_id)
+    return response
+
+
+@router.get("/jobs/{batch_id}", response_model=FilingBatchResponse)
+def get_batch(batch_id: str) -> FilingBatchResponse:
+    s = get_session()
+    try:
+        batch = s.get(FilingBatch, batch_id)
+        if batch is None:
+            raise HTTPException(status_code=404, detail="batch not found")
+        return _batch_response(batch)
+    finally:
+        s.close()
+
+
+@router.get("/jobs/{batch_id}/events")
+async def stream_batch(batch_id: str):
+    async def event_gen():
+        last = None
+        while True:
+            s = get_session()
+            try:
+                batch = s.get(FilingBatch, batch_id)
+                if batch is None:
+                    yield {
+                        "event": "error",
+                        "data": json.dumps({"detail": "batch not found"}),
+                    }
+                    return
+                payload = _batch_response(batch).model_dump_json()
+                done = batch.status in TERMINAL_STATUSES
+            finally:
+                s.close()
+
+            if payload != last:
+                yield {"event": "progress", "data": payload}
+                last = payload
+            if done:
+                return
+            await asyncio.sleep(POLL_INTERVAL_S)
+
+    return EventSourceResponse(event_gen())
+
+
 @router.get("/files/unfiled", response_model=list[UnfiledFile])
 def list_unfiled_files() -> list[UnfiledFile]:
-    """Files that have been dropped in and are awaiting (or ready for) filing."""
-    return _FILES
+    """Inbox files not yet filed, newest first."""
+    s = get_session()
+    try:
+        rows = (
+            s.execute(
+                select(InboxFile)
+                .where(InboxFile.status != "filed")
+                .order_by(InboxFile.added_at.desc())
+            )
+            .scalars()
+            .all()
+        )
+        counts = dict(
+            s.execute(
+                select(FilingSuggestion.inbox_file_id, func.count()).group_by(
+                    FilingSuggestion.inbox_file_id
+                )
+            ).all()
+        )
+        return [_unfiled(r, counts.get(r.id, 0)) for r in rows]
+    finally:
+        s.close()
 
 
 @router.get("/files/{file_id}/suggestions", response_model=SuggestionList)
 def get_suggestions(file_id: str) -> SuggestionList:
     """Top folder suggestions for a file, highest confidence first."""
-    file = _FILES_BY_ID.get(file_id)
-    if file is None:
-        raise HTTPException(status_code=404, detail="file not found")
-    suggestions = sorted(
-        _build_suggestions(file_id),
-        key=lambda s: s.confidence,
-        reverse=True,
-    )
-    return SuggestionList(
-        file_id=file_id, filename=file.filename, suggestions=suggestions
-    )
+    s = get_session()
+    try:
+        rec = s.get(InboxFile, file_id)
+        if rec is None:
+            raise HTTPException(status_code=404, detail="file not found")
+        rows = (
+            s.execute(
+                select(FilingSuggestion)
+                .where(FilingSuggestion.inbox_file_id == file_id)
+                .order_by(FilingSuggestion.confidence.desc())
+            )
+            .scalars()
+            .all()
+        )
+        suggestions = [
+            Suggestion(
+                suggestion_id=row.id,
+                folder_name=Path(row.folder_path).name,
+                folder_path=row.folder_path,
+                absolute_path=row.folder_path,
+                confidence=row.confidence,
+                rationale=row.rationale,
+            )
+            for row in rows
+        ]
+        return SuggestionList(
+            file_id=file_id, filename=rec.filename, suggestions=suggestions
+        )
+    finally:
+        s.close()
 
 
 @router.post(
@@ -335,47 +321,50 @@ def get_suggestions(file_id: str) -> SuggestionList:
     response_model=AcceptResult,
 )
 def accept_suggestion(file_id: str, suggestion_id: str) -> AcceptResult:
-    """Accept a suggestion: file the document into the suggested folder."""
-    file = _FILES_BY_ID.get(file_id)
-    if file is None:
-        raise HTTPException(status_code=404, detail="file not found")
-    suggestion = next(
-        (s for s in _build_suggestions(file_id) if s.suggestion_id == suggestion_id),
-        None,
-    )
-    if suggestion is None:
-        raise HTTPException(status_code=404, detail="suggestion not found")
-    return AcceptResult(
-        file_id=file_id,
-        suggestion_id=suggestion_id,
-        status="filed",
-        moved_to=f"{suggestion.absolute_path}/{file.filename}",
-    )
+    """Accept a suggestion: move the file into the suggested folder."""
+    s = get_session()
+    try:
+        rec = s.get(InboxFile, file_id)
+        if rec is None:
+            raise HTTPException(status_code=404, detail="file not found")
+        sug = s.get(FilingSuggestion, suggestion_id)
+        if sug is None or sug.inbox_file_id != file_id:
+            raise HTTPException(status_code=404, detail="suggestion not found")
+        moved_to = _move_into(s, rec, sug.folder_path, accepted=True)
+        return AcceptResult(
+            file_id=file_id,
+            suggestion_id=suggestion_id,
+            status="filed",
+            moved_to=moved_to,
+        )
+    finally:
+        s.close()
 
 
 @router.post("/files/{file_id}/file", response_model=FiledResult)
 def file_into_folder(file_id: str, req: FileIntoFolderRequest) -> FiledResult:
     """File a document into an arbitrary folder (e.g. via drag-and-drop)."""
-    file = _FILES_BY_ID.get(file_id)
-    if file is None:
-        raise HTTPException(status_code=404, detail="file not found")
-    folder = req.folder_path.strip().rstrip("/")
-    if not folder:
-        raise HTTPException(status_code=400, detail="folder_path is required")
-    base = folder if folder.startswith("/") else f"{_LIBRARY_ROOT}/{folder}"
-    return FiledResult(
-        file_id=file_id,
-        folder_path=folder,
-        status="filed",
-        moved_to=f"{base}/{file.filename}",
-    )
+    s = get_session()
+    try:
+        rec = s.get(InboxFile, file_id)
+        if rec is None:
+            raise HTTPException(status_code=404, detail="file not found")
+        moved_to = _move_into(s, rec, req.folder_path, accepted=False)
+        return FiledResult(
+            file_id=file_id,
+            folder_path=req.folder_path.strip().rstrip("/"),
+            status="filed",
+            moved_to=moved_to,
+        )
+    finally:
+        s.close()
 
 
 @router.get("/entries", response_model=list[FsEntry])
-def list_entries(path: str = _LIBRARY_ROOT) -> list[FsEntry]:
+def list_entries_endpoint(path: str = LIBRARY_ROOT) -> list[FsEntry]:
     """Immediate subfolders and files of `path` (defaults to the library root).
 
     The Library pane calls this lazily, one level per expansion, so large or
     slow (network) volumes under /Volumes don't have to be read up front.
     """
-    return _list_entries(Path(path))
+    return list_entries(Path(path))

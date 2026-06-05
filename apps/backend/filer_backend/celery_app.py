@@ -5,7 +5,7 @@ from filer_backend.config import celery_broker_transport_options
 celery_app = Celery(
     "filer",
     broker="filesystem://",
-    include=["filer_backend.indexing.tasks"],
+    include=["filer_backend.indexing.tasks", "filer_backend.filing.tasks"],
 )
 
 celery_app.conf.update(
