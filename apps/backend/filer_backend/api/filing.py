@@ -9,7 +9,7 @@ Serves the Filing screen end-to-end:
 - POST /filing/files/{id}/file — move into an arbitrary folder (drag-and-drop)
 - GET  /filing/entries         — lazy real-filesystem listing for the Library tree
 
-Files are processed one-by-one by a Celery task (see filing/runner.py). 
+Files are processed one-by-one by a Celery task (see filing/runner.py).
 """
 
 import asyncio
