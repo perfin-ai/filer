@@ -101,6 +101,19 @@ class FilingSuggestion(Base):
     confidence: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     rationale: Mapped[str | None] = mapped_column(String, nullable=True)
     rank: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    is_new: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+
+class Document(Base):
+    """Per-file text-extraction state (chunks/vectors live in LanceDB)."""
+
+    __tablename__ = "documents"
+
+    file_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    parser_used: Mapped[str | None] = mapped_column(String, nullable=True)
+    extraction_status: Mapped[str] = mapped_column(String, nullable=False)
+    token_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    extracted_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
 
 class FilingAction(Base):

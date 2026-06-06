@@ -20,6 +20,23 @@ def db_url() -> str:
     return f"sqlite:///{db_path()}"
 
 
+def lancedb_dir() -> Path:
+    d = app_data_dir() / "lancedb"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
+def model_cache_dir() -> Path:
+    d = app_data_dir() / "models"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
+def config_file() -> Path:
+    """User-editable settings file (see settings.py)."""
+    return app_data_dir() / "config.toml"
+
+
 def celery_broker_dir() -> Path:
     d = app_data_dir() / "celery"
     (d / "in").mkdir(parents=True, exist_ok=True)
