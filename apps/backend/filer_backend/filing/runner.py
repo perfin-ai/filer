@@ -63,15 +63,16 @@ def _process_one(s: Session, file_id: str) -> None:
     s.commit()
 
     rec.content_hash = hash_file(Path(rec.absolute_path))
-    for rank, (folder, confidence, rationale) in enumerate(suggest_folders(rec)):
+    for rank, sug in enumerate(suggest_folders(rec)):
         s.add(
             FilingSuggestion(
                 id=uuid4().hex,
                 inbox_file_id=file_id,
-                folder_path=folder,
-                confidence=confidence,
-                rationale=rationale,
+                folder_path=sug.folder_path,
+                confidence=sug.confidence,
+                rationale=sug.rationale,
                 rank=rank,
+                is_new=sug.is_new,
             )
         )
     rec.status = "ready"
