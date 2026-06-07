@@ -4632,6 +4632,727 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "Z2hXW",
+      "x": 4280,
+      "y": 0,
+      "name": "Slide — Architecture",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#ffffff",
+      "layout": "none",
+      "children": [
+        {
+          "type": "text",
+          "id": "Ynbdh",
+          "x": 80,
+          "y": 44,
+          "name": "t",
+          "fill": "#1c1c1e",
+          "content": "Filer — System Architecture",
+          "fontFamily": "Inter",
+          "fontSize": 52,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "B4hhF",
+          "x": 82,
+          "y": 118,
+          "name": "t",
+          "fill": "#5a5a60",
+          "content": "Local-first macOS desktop · your files never leave the device",
+          "fontFamily": "Inter",
+          "fontSize": 26
+        },
+        {
+          "type": "frame",
+          "id": "tOlad",
+          "x": 80,
+          "y": 196,
+          "name": "Band",
+          "width": 1760,
+          "height": 118,
+          "fill": "#ffffff",
+          "cornerRadius": 14,
+          "stroke": "#d6d9de",
+          "strokeWidth": 1,
+          "strokeAlignment": "inner",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": 18,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "g6q6a",
+              "name": "t",
+              "fill": "#1c1c1e",
+              "content": "Desktop Shell · Tauri + React",
+              "fontFamily": "Inter",
+              "fontSize": 26,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "K6gktK",
+              "name": "row",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "UR1l0",
+                  "name": "chip",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 9,
+                  "padding": [
+                    9,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "c0jJR4",
+                      "name": "t",
+                      "fill": "#0a84ff",
+                      "content": "Indexing tab",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "deBeC",
+                  "name": "chip",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 9,
+                  "padding": [
+                    9,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "BRAl7",
+                      "name": "t",
+                      "fill": "#0a84ff",
+                      "content": "Filing tab",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "icon",
+          "id": "O4C02",
+          "x": 940,
+          "y": 326,
+          "name": "down",
+          "width": 40,
+          "height": 40,
+          "icon": "arrow-down",
+          "library": "lucide",
+          "fill": "#0a84ff"
+        },
+        {
+          "type": "frame",
+          "id": "ifZsP",
+          "x": 80,
+          "y": 386,
+          "name": "Band",
+          "width": 1760,
+          "height": 118,
+          "fill": "#ffffff",
+          "cornerRadius": 14,
+          "stroke": "#d6d9de",
+          "strokeWidth": 1,
+          "strokeAlignment": "inner",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": 18,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "gCREv",
+              "name": "t",
+              "fill": "#1c1c1e",
+              "content": "Python Sidecar · FastAPI on 127.0.0.1",
+              "fontFamily": "Inter",
+              "fontSize": 26,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "Jx7gR",
+              "name": "row",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "e9ePI",
+                  "name": "chip",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 9,
+                  "padding": [
+                    9,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "IdstB",
+                      "name": "t",
+                      "fill": "#0a84ff",
+                      "content": "REST API",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "T29rjT",
+                  "name": "chip",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 9,
+                  "padding": [
+                    9,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Al9In",
+                      "name": "t",
+                      "fill": "#0a84ff",
+                      "content": "SSE progress",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "qCTlb",
+                  "name": "chip",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 9,
+                  "padding": [
+                    9,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ilv99",
+                      "name": "t",
+                      "fill": "#0a84ff",
+                      "content": "Celery worker (filesystem broker)",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "icon",
+          "id": "XB7Mi",
+          "x": 940,
+          "y": 516,
+          "name": "down",
+          "width": 40,
+          "height": 40,
+          "icon": "arrow-down",
+          "library": "lucide",
+          "fill": "#0a84ff"
+        },
+        {
+          "type": "frame",
+          "id": "XWM6O",
+          "x": 80,
+          "y": 574,
+          "name": "Band",
+          "width": 860,
+          "height": 252,
+          "fill": "#ffffff",
+          "cornerRadius": 14,
+          "stroke": "#d6d9de",
+          "strokeWidth": 1,
+          "strokeAlignment": "inner",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": 18,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "Ek0K6",
+              "name": "t",
+              "fill": "#0a84ff",
+              "content": "Indexing pipeline",
+              "fontFamily": "Inter",
+              "fontSize": 24,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "cryQg",
+              "name": "steps",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "gueOf",
+                  "name": "step",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 8,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "QSZFd",
+                      "name": "t",
+                      "fill": "#1c1c1e",
+                      "content": "Walk",
+                      "fontFamily": "Inter",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "icon",
+                  "id": "mJCBY",
+                  "name": "arr",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "arrow-right",
+                  "library": "lucide",
+                  "fill": "#5a5a60"
+                },
+                {
+                  "type": "frame",
+                  "id": "YnZei",
+                  "name": "step",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 8,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "lwguf",
+                      "name": "t",
+                      "fill": "#1c1c1e",
+                      "content": "Extract",
+                      "fontFamily": "Inter",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "icon",
+                  "id": "UG4Pg",
+                  "name": "arr",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "arrow-right",
+                  "library": "lucide",
+                  "fill": "#5a5a60"
+                },
+                {
+                  "type": "frame",
+                  "id": "PmuuF",
+                  "name": "step",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 8,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "f2icr",
+                      "name": "t",
+                      "fill": "#1c1c1e",
+                      "content": "Chunk",
+                      "fontFamily": "Inter",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "icon",
+                  "id": "RUVRG",
+                  "name": "arr",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "arrow-right",
+                  "library": "lucide",
+                  "fill": "#5a5a60"
+                },
+                {
+                  "type": "frame",
+                  "id": "GV45Y",
+                  "name": "step",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 8,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "FnfLJ",
+                      "name": "t",
+                      "fill": "#1c1c1e",
+                      "content": "Embed",
+                      "fontFamily": "Inter",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "icon",
+                  "id": "ZCVL8",
+                  "name": "arr",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "arrow-right",
+                  "library": "lucide",
+                  "fill": "#5a5a60"
+                },
+                {
+                  "type": "frame",
+                  "id": "a1Y4b",
+                  "name": "step",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 8,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "umi9N",
+                      "name": "t",
+                      "fill": "#1c1c1e",
+                      "content": "LanceDB",
+                      "fontFamily": "Inter",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ztUh7",
+          "x": 980,
+          "y": 574,
+          "name": "Band",
+          "width": 860,
+          "height": 252,
+          "fill": "#ffffff",
+          "cornerRadius": 14,
+          "stroke": "#d6d9de",
+          "strokeWidth": 1,
+          "strokeAlignment": "inner",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": 18,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "E71m5",
+              "name": "t",
+              "fill": "#0a84ff",
+              "content": "Filing · Suggestor",
+              "fontFamily": "Inter",
+              "fontSize": 24,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "OF07m",
+              "name": "steps",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "McY5p",
+                  "name": "step",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 8,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "gIN4t",
+                      "name": "t",
+                      "fill": "#1c1c1e",
+                      "content": "Retrieve (hybrid)",
+                      "fontFamily": "Inter",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "icon",
+                  "id": "JIfYR",
+                  "name": "arr",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "arrow-right",
+                  "library": "lucide",
+                  "fill": "#5a5a60"
+                },
+                {
+                  "type": "frame",
+                  "id": "BAe7O",
+                  "name": "step",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 8,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "cpH91",
+                      "name": "t",
+                      "fill": "#1c1c1e",
+                      "content": "LLM",
+                      "fontFamily": "Inter",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "icon",
+                  "id": "fCwWL",
+                  "name": "arr",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "arrow-right",
+                  "library": "lucide",
+                  "fill": "#5a5a60"
+                },
+                {
+                  "type": "frame",
+                  "id": "d6VjV",
+                  "name": "step",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 8,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Z8arZP",
+                      "name": "t",
+                      "fill": "#1c1c1e",
+                      "content": "Move",
+                      "fontFamily": "Inter",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "xi79v",
+              "name": "t",
+              "fill": "#5a5a60",
+              "content": "proposes new folders · rules via hints",
+              "fontFamily": "Inter",
+              "fontSize": 18
+            }
+          ]
+        },
+        {
+          "type": "icon",
+          "id": "zdiUp",
+          "x": 940,
+          "y": 838,
+          "name": "down",
+          "width": 40,
+          "height": 40,
+          "icon": "arrow-down",
+          "library": "lucide",
+          "fill": "#0a84ff"
+        },
+        {
+          "type": "frame",
+          "id": "v91nh",
+          "x": 80,
+          "y": 892,
+          "name": "Band",
+          "width": 1760,
+          "height": 118,
+          "fill": "#ffffff",
+          "cornerRadius": 14,
+          "stroke": "#d6d9de",
+          "strokeWidth": 1,
+          "strokeAlignment": "inner",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": 18,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "Sz3QY",
+              "name": "t",
+              "fill": "#1c1c1e",
+              "content": "Local stores & models",
+              "fontFamily": "Inter",
+              "fontSize": 22,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "XZG6u",
+              "name": "row",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "m7N9B",
+                  "name": "chip",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 9,
+                  "padding": [
+                    9,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "DgHah",
+                      "name": "t",
+                      "fill": "#0a84ff",
+                      "content": "SQLite — jobs · files · inbox · actions",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "VRDc7",
+                  "name": "chip",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 9,
+                  "padding": [
+                    9,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Ftn2c",
+                      "name": "t",
+                      "fill": "#0a84ff",
+                      "content": "LanceDB — dense vectors + BM25",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "rOldm",
+                  "name": "chip",
+                  "fill": "#0a84ff14",
+                  "cornerRadius": 9,
+                  "padding": [
+                    9,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "E4ub7B",
+                      "name": "t",
+                      "fill": "#0a84ff",
+                      "content": "LLM — Ollama / OpenAI / Anthropic / Google",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "OoWeW",
+          "x": 80,
+          "y": 1028,
+          "name": "t",
+          "fill": "#5a5a60",
+          "content": "100% local-first · swappable LLM providers · embeddings via fastembed (ONNX)",
+          "fontFamily": "Inter",
+          "fontSize": 20
+        }
+      ]
     }
   ],
   "themes": {
