@@ -6,11 +6,12 @@ from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
+from sqlalchemy import delete, func, select
 from sse_starlette.sse import EventSourceResponse
 
 from filer_backend.indexing.tasks import index_root_task
 from filer_backend.storage.db import get_session
-from filer_backend.storage.models import IndexJob
+from filer_backend.storage.models import File, Folder, IndexJob
 
 router = APIRouter(prefix="/index", tags=["indexing"])
 
@@ -31,6 +32,21 @@ class IndexJobResponse(BaseModel):
     files_indexed: int = 0
     files_skipped: int = 0
     error: str | None = None
+
+
+class IndexHistoryEntry(BaseModel):
+    root_path: str
+    last_indexed_at: datetime | None = None
+    last_status: str
+    last_job_id: str
+    file_count: int = 0
+
+
+def _like_prefix(root: str) -> str:
+    """LIKE pattern matching every path under `root`, with wildcards escaped."""
+    base = root if root.endswith("/") else root + "/"
+    escaped = base.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return escaped + "%"
 
 
 def _to_response(job: IndexJob) -> IndexJobResponse:
@@ -74,6 +90,78 @@ def start_index(req: IndexStartRequest) -> IndexJobResponse:
 
     index_root_task.apply_async(args=[resolved, job_id], task_id=job_id)
     return response
+
+
+@router.get("/history", response_model=list[IndexHistoryEntry])
+def list_history() -> list[IndexHistoryEntry]:
+    """One entry per indexed root, newest first, with its current file count."""
+    s = get_session()
+    try:
+        jobs = (
+            s.execute(select(IndexJob).order_by(IndexJob.created_at.desc()))
+            .scalars()
+            .all()
+        )
+        entries: list[IndexHistoryEntry] = []
+        seen: set[str] = set()
+        for job in jobs:
+            if job.root_path in seen:
+                continue
+            seen.add(job.root_path)
+            count = s.execute(
+                select(func.count())
+                .select_from(File)
+                .where(File.absolute_path.like(_like_prefix(job.root_path), escape="\\"))
+            ).scalar_one()
+            last_indexed = job.completed_at or job.updated_at
+            if last_indexed is not None and last_indexed.tzinfo is None:
+                last_indexed = last_indexed.replace(tzinfo=timezone.utc)
+            entries.append(
+                IndexHistoryEntry(
+                    root_path=job.root_path,
+                    last_indexed_at=last_indexed,
+                    last_status=job.status,
+                    last_job_id=job.id,
+                    file_count=count,
+                )
+            )
+        return entries
+    finally:
+        s.close()
+
+
+class DeleteHistoryResponse(BaseModel):
+    root_path: str
+    files_deleted: int
+    jobs_deleted: int
+
+
+@router.delete("/history", response_model=DeleteHistoryResponse)
+def delete_history(root_path: str) -> DeleteHistoryResponse:
+    """Purge all indexed files, folders, and job rows for a root."""
+    prefix = _like_prefix(root_path)
+    s = get_session()
+    try:
+        files_deleted = s.execute(
+            delete(File).where(File.absolute_path.like(prefix, escape="\\"))
+        ).rowcount
+        s.execute(
+            delete(Folder).where(
+                (Folder.absolute_path == root_path)
+                | (Folder.absolute_path.like(prefix, escape="\\"))
+            )
+        )
+        jobs_deleted = s.execute(
+            delete(IndexJob).where(IndexJob.root_path == root_path)
+        ).rowcount
+        s.commit()
+        return DeleteHistoryResponse(
+            root_path=root_path,
+            files_deleted=files_deleted or 0,
+            jobs_deleted=jobs_deleted or 0,
+        )
+    finally:
+        s.close()
 
 
 @router.get("/jobs/{job_id}", response_model=IndexJobResponse)
