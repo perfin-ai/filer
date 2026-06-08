@@ -34,5 +34,22 @@ cd apps/backend && uv run celery -A filer_backend.celery_app worker --pool=solo 
 cd apps/shell && npm run dev
 ```
 
+### Development notebook
+
+A dev-only Jupyter notebook for poking at the low-level objects (configuration, file
+extraction/chunking, embeddings, the vector store + retrieval, suggestions, and LLMs):
+
+```sh
+# one-time: add the dev dependency group (jupyterlab + ipykernel)
+cd apps/backend && uv add --dev jupyterlab ipykernel   # or `uv sync` once it's in pyproject.toml
+
+# launch (runs in the backend uv venv, so `filer_backend` imports resolve)
+cd apps/backend && uv run jupyter lab
+```
+
+Then open `notebooks/playground.ipynb`. It defaults to an **isolated scratch DB / LanceDB**
+(`apps/backend/notebooks/scratch/`) and an **offline LLM (`TestModel`)**, so it touches no real app
+data and needs no API keys. Dev-only — it is not part of the shipped app.
+
 Local app data (SQLite DB, Celery broker dirs, future LanceDB / thumbnails / logs) lives at
 `~/Library/Application Support/Filer/`.
