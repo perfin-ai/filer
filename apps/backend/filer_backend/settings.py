@@ -4,12 +4,19 @@ Loaded (lowest→highest precedence) from defaults → a user TOML file at
 `config.config_file()` → environment variables (prefix `FILER_`, nested with
 `__`, e.g. `FILER_LLM__PROVIDER=openai`).
 
+An `apps/backend/.env` file is loaded into the process environment at import
+(via python-dotenv, without overriding already-set vars). That populates both
+the `FILER_*` settings below and the provider SDK keys (`OPENAI_API_KEY`, …),
+which the SDKs read straight from `os.environ`.
+
 Named `profiles` let us swap LLMs for experiments; profile names line up with
 evaluation experiment labels (see filer_backend/eval).
 """
 
 from functools import lru_cache
+from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from pydantic_settings import (
     BaseSettings,
@@ -19,6 +26,11 @@ from pydantic_settings import (
 )
 
 from filer_backend.config import config_file
+
+# Load apps/backend/.env (resolved absolutely so it works regardless of CWD)
+# before any Settings() is constructed. override=False keeps real exported
+# env vars authoritative over the file.
+load_dotenv(Path(__file__).resolve().parent.parent / ".env", override=False)
 
 
 class LLMConfig(BaseModel):
@@ -57,7 +69,7 @@ class Settings(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
-        # Precedence: init > env > TOML file > defaults.
+        # Precedence: init > env (incl. loaded .env) > TOML file > defaults.
         return (
             init_settings,
             env_settings,
