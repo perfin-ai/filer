@@ -21,7 +21,7 @@ from filer_backend.filing.fs import kind_for
 from filer_backend.filing.suggester import suggest_folders
 from filer_backend.settings import get_settings, settings_for_profile
 from filer_backend.storage.db import get_session
-from filer_backend.storage.models import File, InboxFile
+from filer_backend.storage.models import File, Folder, InboxFile
 
 
 def _norm(p: str) -> str:
@@ -158,6 +158,100 @@ def run_eval(
             "profile": profile,
             "llm": settings.llm.model_dump(),
             "embedding": settings.embedding.model_dump(),
+            "n_requested": n,
+            "n_scored": len(samples),
+        },
+        "elapsed_s": round(elapsed, 2),
+        "metrics": metrics,
+        "samples": samples,
+    }
+
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / f"{label}.json").write_text(json.dumps(result, indent=2, default=str))
+    _append_summary(out / "summary.csv", result)
+    return result
+
+
+def run_random_baseline(
+    label: str = "RANDOM",
+    n: int = 50,
+    seed: int = 42,
+    root: str | None = None,
+    out_dir: str = "evals",
+    k: int = 3,
+) -> dict:
+    """Closed-form baseline: pick `k` distinct folders uniformly at random.
+
+    The "no-AI" floor for the suggestor. Instead of one noisy random draw we
+    compute the exact expected metric for each sampled file, which removes
+    sampling variance. With N existing folders and k distinct random picks
+    (truth always among the N): E[acc@1]=1/N, E[acc@k]=k/N, E[MRR]=H_k/N where
+    H_k=sum(1/i). Expected prefix credit averages `_prefix_credit` over all N
+    folders, since the top pick is uniform. Same sample, ground truth, density
+    buckets and aggregation as `run_eval`, so rows are directly comparable.
+    """
+    settings = get_settings()
+
+    s = get_session()
+    try:
+        q = select(File)
+        if root:
+            q = q.where(File.absolute_path.like(_norm(root) + "/%", escape="\\"))
+        files = list(s.execute(q).scalars())
+        folder_counts = Counter(str(Path(f.absolute_path).parent) for f in files)
+        # Universe of existing folders: every indexed folder + every file's
+        # parent (so the ground-truth folder is always reachable).
+        universe = {_norm(p) for p in s.execute(select(Folder.absolute_path)).scalars()}
+        universe |= {_norm(str(Path(f.absolute_path).parent)) for f in files}
+    finally:
+        s.close()
+
+    if not files:
+        raise SystemExit("no indexed files found; index a tree first")
+    folders = sorted(universe)
+    N = len(folders)
+    if N < k:
+        raise SystemExit(f"need at least k={k} folders, found {N}")
+
+    # Position-independent expectations (constant across files).
+    h_k = sum(1.0 / i for i in range(1, k + 1))
+    e_hit1, e_hitk, e_mrr = 1.0 / N, k / N, h_k / N
+
+    chosen = _sample(files, n, seed)
+    t0 = time.monotonic()
+    samples: list[dict] = []
+    for f in chosen:
+        truth = _norm(str(Path(f.absolute_path).parent))
+        # Expected prefix credit: top pick is uniform over all folders.
+        e_prefix = sum(_prefix_credit(p, truth) for p in folders) / N
+        samples.append(
+            {
+                "file_id": f.id,
+                "filename": f.filename,
+                "truth": truth,
+                "predicted": [],  # expectation over all draws, not one sample
+                "kind": kind_for(f.filename),
+                "density": "existing" if folder_counts[truth] > 1 else "singleton",
+                "hit@1": e_hit1,
+                "hit@3": e_hitk,
+                "rr": e_mrr,
+                "prefix": e_prefix,
+            }
+        )
+    elapsed = time.monotonic() - t0
+
+    metrics = _aggregate(samples)
+    result = {
+        "label": label,
+        "ran_at": datetime.now(timezone.utc).isoformat(),
+        "config": {
+            "seed": seed,
+            "profile": None,
+            "strategy": f"random-{k} (closed-form expectation)",
+            "n_folders": N,
+            "llm": {"model": f"random@{k}"},
+            "embedding": {"model": "none"},
             "n_requested": n,
             "n_scored": len(samples),
         },
