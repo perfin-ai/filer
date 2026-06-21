@@ -1,0 +1,877 @@
+{
+  "label": "EXP01",
+  "ran_at": "2026-06-21T03:58:34.898516+00:00",
+  "config": {
+    "seed": 42,
+    "profile": null,
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "temperature": 0.0,
+      "base_url": "http://localhost:11434/v1"
+    },
+    "embedding": {
+      "model": "BAAI/bge-small-en-v1.5"
+    },
+    "n_requested": 50,
+    "n_scored": 50
+  },
+  "elapsed_s": 139.57,
+  "metrics": {
+    "overall": {
+      "n": 50,
+      "acc@1": 0.54,
+      "acc@3": 0.74,
+      "mrr": 0.6366666666666666,
+      "prefix": 0.8853434343434343
+    },
+    "by_kind": {
+      "image": {
+        "n": 4,
+        "acc@1": 0.25,
+        "acc@3": 0.25,
+        "mrr": 0.25,
+        "prefix": 0.7431818181818182
+      },
+      "other": {
+        "n": 2,
+        "acc@1": 0.0,
+        "acc@3": 0.0,
+        "mrr": 0.0,
+        "prefix": 0.7777777777777778
+      },
+      "pdf": {
+        "n": 42,
+        "acc@1": 0.5714285714285714,
+        "acc@3": 0.8095238095238095,
+        "mrr": 0.6865079365079365,
+        "prefix": 0.8985449735449735
+      },
+      "spreadsheet": {
+        "n": 2,
+        "acc@1": 1.0,
+        "acc@3": 1.0,
+        "mrr": 1.0,
+        "prefix": 1.0
+      }
+    },
+    "by_density": {
+      "existing": {
+        "n": 48,
+        "acc@1": 0.5208333333333334,
+        "acc@3": 0.7291666666666666,
+        "mrr": 0.6215277777777778,
+        "prefix": 0.8805660774410774
+      },
+      "singleton": {
+        "n": 2,
+        "acc@1": 1.0,
+        "acc@3": 1.0,
+        "mrr": 1.0,
+        "prefix": 1.0
+      }
+    }
+  },
+  "samples": [
+    {
+      "file_id": 229,
+      "filename": "Template Example.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Jobs/BairesDev",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Jobs/BairesDev",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Online Services",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Taxes/Documents"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 52,
+      "filename": "2025_10_17.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Credit/Wells Fargo/Platinum Card 6365/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Credit/Wells Fargo/Platinum Card 6365/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Credit/Wells Fargo/Visa Cashback 1680",
+        "/Volumes/home/_Documents/_Records/_By Year/2026/Banking/Credit/Wells Fargo/Platinum Card 6365/Statements"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 564,
+      "filename": "2025_05_25 17_20.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/General/Costco",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/General/Costco",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Whole Foods"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 502,
+      "filename": "2025_01_17_01.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Whole Foods",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Labs",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Electric Usage Data",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.7
+    },
+    {
+      "file_id": 458,
+      "filename": "2025_10_22.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/2025"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 286,
+      "filename": "2025_06_30.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Encanto/Banking/Wells Fargo/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Whiffletree/Banking/WF Checking",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Banking/Wells Fargo Checking/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Encanto/Banking/Wells Fargo/Statements"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 1.0,
+      "rr": 0.3333333333333333,
+      "prefix": 0.5833333333333334
+    },
+    {
+      "file_id": 210,
+      "filename": "title.ratings.tsv.gz",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/IMDB Data/gz",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Data/IMDB Data/tsv",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/IMDB Data/tsv",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Data/IMDB Data"
+      ],
+      "kind": "other",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.7777777777777778
+    },
+    {
+      "file_id": 179,
+      "filename": "Blood Work Requisition.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Ekberg Blood Work Orders/2025_09_05",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Labs",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Ekberg Blood Work Orders/2025_03_19",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Ekberg Blood Work Orders"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.8
+    },
+    {
+      "file_id": 865,
+      "filename": "2025_06_30.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Retirement/Schwab/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Retirement/Schwab/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Taxes/Documents",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Retirement/Schwab"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 66,
+      "filename": "2025_12_31.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Checking/Wells Fargo/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Checking/Wells Fargo/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Banking/Wells Fargo Checking/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Savings/Wells Fargo/Joint 0469"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 62,
+      "filename": "2025_08_31.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Checking/Wells Fargo/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Checking/Wells Fargo/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Banking/Wells Fargo Checking/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Savings/Wells Fargo/Personal 1737"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 192,
+      "filename": "CS Link After Visit.PDF",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Watchtel - Sleep",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Watchtel - Sleep",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Hospital",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Seizer"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 448,
+      "filename": "2025_09_03_17_52.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions/2025"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 477,
+      "filename": "2025_01_14_01.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Trader Joe's",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Electric Usage Data",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Labs",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Credit/Wells Fargo/Signify 5222/Documents"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.7
+    },
+    {
+      "file_id": 1035,
+      "filename": "IMG_6626.HEIC",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/eBay/Camera Gear/Photos/Indoor Camera",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/IMDB Data",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Courses"
+      ],
+      "kind": "image",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.6363636363636364
+    },
+    {
+      "file_id": 55,
+      "filename": "2025_01_31.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Checking/Wells Fargo/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Checking/Wells Fargo/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Banking/Wells Fargo Checking/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Spring Hill/Banking/Wells Fargo/Statements"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 408,
+      "filename": "2025_04_11_01.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Electric Usage Data",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Labs",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.7
+    },
+    {
+      "file_id": 860,
+      "filename": "2025_01_31.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Retirement/Schwab/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Retirement/Schwab/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Taxes/Documents",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Retirement/Schwab"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 452,
+      "filename": "2025_09_26_18_13.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 920,
+      "filename": "IMG_7108.HEIC",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Travel + Vacation/Cruising/Packing Photos/Originals",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Hospital",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/IMDB Data",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Courses"
+      ],
+      "kind": "image",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.6363636363636364
+    },
+    {
+      "file_id": 570,
+      "filename": "2025_03_06_01.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Hardware Stores/Lowe's",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Electric Usage Data",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Analysis",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Letters"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.7
+    },
+    {
+      "file_id": 14,
+      "filename": "2025-03-09.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Credit/American Express/Platinum/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Credit/American Express/Platinum/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Credit/American Express/Business Gold/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Credit/American Express/Business Blue/Statements"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 327,
+      "filename": "2025 EXECUTED Renewal - 15151 Encanto.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Encanto/Lease",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Encanto/Lease",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Encanto/Property Management/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Encanto/Property Management"
+      ],
+      "kind": "pdf",
+      "density": "singleton",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 866,
+      "filename": "2025_07_31.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Retirement/Schwab/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Retirement/Schwab/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Taxes/Documents",
+        "/Volumes/home/_Documents/_Records/_By Year/2026/Retirement/Schwab/Statements"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 697,
+      "filename": "2025_05_14.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Internet",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Internet",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Phone/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Water"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 319,
+      "filename": "15151 Encanto - 12 2024 - Fred Murrow (garbage disposal) - $425.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Encanto/Property Management/Paid Bills",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Encanto/Property Management/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Encanto/Property Management/Paid Bills",
+        "/Volumes/home/_Documents/_Records/_By Year/2026/Property/Encanto/Property Management/Statements"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 1.0,
+      "rr": 0.5,
+      "prefix": 0.9090909090909091
+    },
+    {
+      "file_id": 441,
+      "filename": "2025_07_16 13_11.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions/2025"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 690,
+      "filename": "2025_11_04.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Gas/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Gas/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Gas",
+        "/Volumes/home/_Documents/_Records/_By Year/2026/Reeves/Utilities/Gas/Statements"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 190,
+      "filename": "2025_12_22 trinet confirmation of COBRA election.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Insurance",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Insurance",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Offers/Healthcare",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/COBRA"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 779,
+      "filename": "2025_04_30.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Banking/Wells Fargo Checking/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Checking/Wells Fargo/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Banking/Wells Fargo Checking/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Savings/Wells Fargo/Joint 0469"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 1.0,
+      "rr": 0.5,
+      "prefix": 0.6363636363636364
+    },
+    {
+      "file_id": 199,
+      "filename": "2025_10_05 Emergency Room After Visit.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Hospital",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Seizer",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Hospital",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Drugs"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 1.0,
+      "rr": 0.5,
+      "prefix": 0.8888888888888888
+    },
+    {
+      "file_id": 736,
+      "filename": "2024_07_02.xlsx",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Electric Usage Data",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Electric Usage Data",
+        "/Volumes/home/_Documents/_Records/_By Year/2024/Reeves/Utilities/Electric/Electric Usage Data",
+        "/Volumes/home/_Documents/_Records/_By Year/2026/Reeves/Utilities/Electric/Electric Usage Data"
+      ],
+      "kind": "spreadsheet",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 705,
+      "filename": "2025_08_07.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Analysis"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 542,
+      "filename": "2025_05_22_01.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Total Body Nutrition",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Total Body Nutrition",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare"
+      ],
+      "kind": "pdf",
+      "density": "singleton",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 89,
+      "filename": "2025_05_31.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Savings/Wells Fargo/Joint 0469",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Savings/Wells Fargo/Personal 1737",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Savings/Wells Fargo/Joint 0469",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Banking/Wells Fargo Checking/Statements"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 1.0,
+      "rr": 0.5,
+      "prefix": 0.9090909090909091
+    },
+    {
+      "file_id": 941,
+      "filename": "Charger Case.jpg",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Travel + Vacation/Cruising/Royal Carribean/Packing/Packing Photos",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Travel + Vacation/Cruising/Royal Carribean/Packing/Packing Photos",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Travel + Vacation/Cruising",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Travel + Vacation/Cruising/Royal Carribean"
+      ],
+      "kind": "image",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 1099,
+      "filename": "2025_04_30.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Whiffletree/Banking/WF Checking",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Encanto/Banking/Wells Fargo/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Banking/Wells Fargo Checking/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Savings/Wells Fargo/Joint 0469"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.7
+    },
+    {
+      "file_id": 256,
+      "filename": "2025_11_14 Encanto Buyer.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Offers/Real Estate",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Encanto/City",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Offers/Real Estate",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/General/Costco"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 1.0,
+      "rr": 0.5,
+      "prefix": 0.7777777777777778
+    },
+    {
+      "file_id": 776,
+      "filename": "2025_02_28.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Banking/Wells Fargo Checking/Statements",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Checking/Wells Fargo/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Banking/Wells Fargo Checking/Statements",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Savings/Wells Fargo/Joint 0469"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 1.0,
+      "rr": 0.5,
+      "prefix": 0.6363636363636364
+    },
+    {
+      "file_id": 162,
+      "filename": "2025_08_14 MRI Approved.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Randi/Foot",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Randi/Foot",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Randi",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Insurance"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 601,
+      "filename": "2025_05_04 16_51 Sprouts.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Vacation/Vegas 05",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Rainbow Acres",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Vacation/Vegas 05",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Trader Joe's"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 1.0,
+      "rr": 0.5,
+      "prefix": 0.8
+    },
+    {
+      "file_id": 741,
+      "filename": "2023_07_02.xlsx",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Electric Usage Data",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Electric Usage Data",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Electric Usage Data/2023",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Electric Usage Data/2023/Monthly Reports"
+      ],
+      "kind": "spreadsheet",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 394,
+      "filename": "2025_02_15_01.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Gelson's",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Reeves/Utilities/Electric/Electric Usage Data",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Labs",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Jobs/BairesDev"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.7
+    },
+    {
+      "file_id": 143,
+      "filename": "2025_05_07 Guardian.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Dental",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Insurance",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Dental",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Randi"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 1.0,
+      "rr": 0.5,
+      "prefix": 0.8888888888888888
+    },
+    {
+      "file_id": 94,
+      "filename": "2025_10_31.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Savings/Wells Fargo/Joint 0469",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Savings/Wells Fargo/Personal 1737",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Savings/Wells Fargo/Joint 0469",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Property/Spring Hill/Banking/Wells Fargo/Statements"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 1.0,
+      "rr": 0.5,
+      "prefix": 0.9090909090909091
+    },
+    {
+      "file_id": 467,
+      "filename": "2025_12_15_01.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Groceries/Pavilions/2025"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 593,
+      "filename": "2025_05_14_01.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Medical/Soleymani",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Medical/Soleymani",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Dental/Soleymani",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Banking/Credit/American Express/Business Blue/Statements"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "rr": 1.0,
+      "prefix": 1.0
+    },
+    {
+      "file_id": 164,
+      "filename": "2025_10_01 Tower Imaging Receipt.pdf",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Randi/Foot",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Heart",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Receipts/Medical",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Bills"
+      ],
+      "kind": "pdf",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.8
+    },
+    {
+      "file_id": 207,
+      "filename": "title.crew.tsv.gz",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/IMDB Data/gz",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Data/IMDB Data/tsv",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/IMDB Data/tsv",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Data/IMDB Data/gz"
+      ],
+      "kind": "other",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.7777777777777778
+    },
+    {
+      "file_id": 929,
+      "filename": "PNG image.png",
+      "truth": "/Volumes/home/_Documents/_Records/_By Year/2025/Travel + Vacation/Cruising/Survey",
+      "predicted": [
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Courses/Papers",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/IMDB Data/tsv",
+        "/Volumes/home/_Documents/_Records/_By Year/2025/Healthcare/Randi/Foot"
+      ],
+      "kind": "image",
+      "density": "existing",
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "rr": 0.0,
+      "prefix": 0.7
+    }
+  ]
+}
