@@ -4,6 +4,7 @@ import csv
 from pathlib import Path
 
 MAX_CHARS = 1_000_000  # cap extracted text so a huge file can't blow up memory
+OCR_SCALE = 3  # pdfium render scale for OCR (~216 DPI); enough for scanned receipts
 
 _TEXT_EXTS = {
     "txt", "md", "markdown", "rst", "log", "json", "yaml", "yml", "ini", "toml",
@@ -11,7 +12,7 @@ _TEXT_EXTS = {
 }
 
 
-def _pdf(path: Path) -> str:
+def _pdf(path: Path) -> tuple[str, str]:
     import pypdfium2 as pdfium
 
     parts: list[str] = []
@@ -24,6 +25,45 @@ def _pdf(path: Path) -> str:
             finally:
                 tp.close()
             page.close()
+            if sum(len(p) for p in parts) >= MAX_CHARS:
+                break
+    finally:
+        pdf.close()
+    text = "\n".join(parts)
+    # Image-only PDFs (e.g. scanned receipts) carry no text layer; OCR them.
+    if text.strip():
+        return text, "pypdfium2"
+    return _ocr_pdf(path), "pypdfium2+tesseract"
+
+
+def _ocr_pdf(path: Path) -> str:
+    """OCR a PDF with no text layer by rendering each page and running Tesseract."""
+    import pypdfium2 as pdfium
+
+    try:
+        import pytesseract
+    except ModuleNotFoundError as e:  # pragma: no cover
+        raise RuntimeError(
+            "PDF has no text layer and pytesseract is not installed for OCR fallback"
+        ) from e
+
+    parts: list[str] = []
+    pdf = pdfium.PdfDocument(str(path))
+    try:
+        for page in pdf:
+            bitmap = page.render(scale=OCR_SCALE)
+            try:
+                image = bitmap.to_pil().convert("L")
+            finally:
+                bitmap.close()
+                page.close()
+            try:
+                parts.append(pytesseract.image_to_string(image))
+            except pytesseract.TesseractNotFoundError as e:
+                raise RuntimeError(
+                    "PDF has no text layer; install the Tesseract binary "
+                    "(e.g. `brew install tesseract`) to enable OCR fallback"
+                ) from e
             if sum(len(p) for p in parts) >= MAX_CHARS:
                 break
     finally:
@@ -79,7 +119,8 @@ def extract_text(path: Path) -> tuple[str, str]:
     """
     ext = path.suffix.lower().lstrip(".")
     if ext == "pdf":
-        return _pdf(path)[:MAX_CHARS], "pypdfium2"
+        text, parser = _pdf(path)
+        return text[:MAX_CHARS], parser
     if ext == "docx":
         return _docx(path)[:MAX_CHARS], "python-docx"
     if ext in ("xlsx", "xlsm"):
