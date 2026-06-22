@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { PointerEvent as ReactPointerEvent } from "react";
+import type {
+  MouseEvent as ReactMouseEvent,
+  PointerEvent as ReactPointerEvent,
+} from "react";
 import { open } from "@tauri-apps/plugin-dialog";
+import { openPath } from "@tauri-apps/plugin-opener";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 
 const BACKEND_URL =
@@ -46,6 +50,23 @@ type SuggestionList = {
   suggestions: Suggestion[];
 };
 
+type FilePreview = {
+  file_id: string;
+  filename: string;
+  kind: FileKind;
+  extension: string | null;
+  size_bytes: number;
+  modified_at: string | null;
+  status: FileStatus;
+  parser_used: string | null;
+  text: string;
+  truncated: boolean;
+};
+
+const HOVER_DELAY_MS = 350;
+const HOVER_CHARS = 600;
+const MODAL_CHARS = 20000;
+
 type FsEntry = {
   name: string;
   path: string;
@@ -83,6 +104,22 @@ export function FilingTab() {
     null
   );
   const flashTimer = useRef<number | null>(null);
+
+  // Content-preview state: a lightweight hover popover and a heavy double-click modal.
+  const previewCache = useRef<Map<string, FilePreview>>(new Map());
+  const [hoverPreview, setHoverPreview] = useState<{
+    fileId: string;
+    text: string;
+    truncated: boolean;
+    top: number;
+    left: number;
+  } | null>(null);
+  const hoverTimer = useRef<number | null>(null);
+  const hoverReq = useRef<string | null>(null);
+  const modalReq = useRef<string | null>(null);
+  const [modalFileId, setModalFileId] = useState<string | null>(null);
+  const [modalData, setModalData] = useState<FilePreview | null>(null);
+  const [modalLoading, setModalLoading] = useState(false);
 
   // Library-tree interaction state.
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -423,9 +460,19 @@ export function FilingTab() {
     [onDragMove, fileInto]
   );
 
+  const clearHover = useCallback(() => {
+    if (hoverTimer.current !== null) {
+      window.clearTimeout(hoverTimer.current);
+      hoverTimer.current = null;
+    }
+    hoverReq.current = null;
+    setHoverPreview(null);
+  }, []);
+
   const startFileDrag = useCallback(
     (e: ReactPointerEvent, file: UnfiledFile) => {
       if (e.button !== 0) return;
+      clearHover();
       dragSrcRef.current = { fileId: file.file_id, filename: file.filename };
       dragStartRef.current = { x: e.clientX, y: e.clientY };
       didDragRef.current = false;
@@ -439,8 +486,113 @@ export function FilingTab() {
       window.addEventListener("pointerup", onDragEnd);
       window.addEventListener("pointercancel", onDragEnd);
     },
-    [onDragMove, onDragEnd]
+    [onDragMove, onDragEnd, clearHover]
   );
+
+  // --- Content preview (hover popover + double-click modal) --------------- //
+  const loadPreview = useCallback(
+    async (fileId: string, limit: number): Promise<FilePreview> => {
+      const cached = previewCache.current.get(fileId);
+      // Reuse the cache when it already holds enough text (or the whole file).
+      if (cached && (cached.text.length >= limit || !cached.truncated)) {
+        return cached;
+      }
+      const res = await fetch(
+        `${BACKEND_URL}/filing/files/${fileId}/preview?limit=${limit}`
+      );
+      if (!res.ok) throw new Error(`preview failed (${res.status})`);
+      const data = (await res.json()) as FilePreview;
+      previewCache.current.set(fileId, data);
+      return data;
+    },
+    []
+  );
+
+  const onRowEnter = useCallback(
+    (e: ReactMouseEvent<HTMLElement>, file: UnfiledFile) => {
+      // Only ready files have cached text; never trigger OCR from a hover.
+      if (file.status !== "ready" || modalFileId) return;
+      // Trigger is the icon, but anchor the popover to the whole row.
+      const row =
+        (e.currentTarget.closest(".file-row") as HTMLElement | null) ??
+        e.currentTarget;
+      const rect = row.getBoundingClientRect();
+      const top = Math.min(rect.top, window.innerHeight - 220);
+      const left = rect.right + 8;
+      if (hoverTimer.current !== null) window.clearTimeout(hoverTimer.current);
+      hoverReq.current = file.file_id;
+      hoverTimer.current = window.setTimeout(() => {
+        loadPreview(file.file_id, HOVER_CHARS)
+          .then((data) => {
+            if (hoverReq.current !== file.file_id) return; // stale
+            setHoverPreview({
+              fileId: file.file_id,
+              text: data.text.slice(0, HOVER_CHARS),
+              truncated: data.truncated || data.text.length > HOVER_CHARS,
+              top,
+              left,
+            });
+          })
+          .catch(() => {});
+      }, HOVER_DELAY_MS);
+    },
+    [loadPreview, modalFileId]
+  );
+
+  const openModal = useCallback(
+    (file: UnfiledFile) => {
+      clearHover();
+      setSelectedId(file.file_id);
+      setModalFileId(file.file_id);
+      setModalData(null);
+      setModalLoading(true);
+      modalReq.current = file.file_id;
+      loadPreview(file.file_id, MODAL_CHARS)
+        .then((data) => {
+          if (modalReq.current !== file.file_id) return; // closed/switched
+          setModalData(data);
+        })
+        .catch(() => {
+          if (modalReq.current === file.file_id) {
+            setFlash({ kind: "err", text: "Couldn't load preview." });
+          }
+        })
+        .finally(() => {
+          if (modalReq.current === file.file_id) setModalLoading(false);
+        });
+    },
+    [clearHover, loadPreview]
+  );
+
+  const closeModal = useCallback(() => {
+    modalReq.current = null;
+    setModalFileId(null);
+    setModalData(null);
+    setModalLoading(false);
+  }, []);
+
+  const openOriginal = useCallback(async (file: UnfiledFile) => {
+    if (IS_TAURI) {
+      try {
+        await openPath(file.absolute_path);
+      } catch (e) {
+        console.error("openPath failed", e);
+        setFlash({ kind: "err", text: "Couldn't open the file." });
+      }
+    } else {
+      window.open(`${BACKEND_URL}/filing/files/${file.file_id}/raw`, "_blank");
+    }
+  }, []);
+
+  // Close the preview modal on Escape.
+  useEffect(() => {
+    if (!modalFileId) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeModal();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [modalFileId, closeModal]);
 
   const toggleExpand = useCallback(
     (path: string) => {
@@ -456,6 +608,7 @@ export function FilingTab() {
   );
 
   const selectedFile = files.find((f) => f.file_id === selectedId) ?? null;
+  const modalFile = files.find((f) => f.file_id === modalFileId) ?? null;
 
   // Re-clicking the active key flips direction; switching key picks a default.
   const changeSort = (key: SortKey) => {
@@ -553,7 +706,7 @@ export function FilingTab() {
                 <li
                   key={f.file_id}
                   className={`file-row${f.file_id === selectedId ? " selected" : ""}`}
-                  title="Click to select · drag onto a folder to file this"
+                  title="Click to select · hover the icon to peek · double-click to preview · drag onto a folder to file"
                   onPointerDown={(e) => startFileDrag(e, f)}
                   onClick={() => {
                     if (didDragRef.current) {
@@ -562,8 +715,15 @@ export function FilingTab() {
                     }
                     setSelectedId(f.file_id);
                   }}
+                  onDoubleClick={() => openModal(f)}
                 >
-                  <FileIcon kind={f.kind} />
+                  <span
+                    className="file-icon-hit"
+                    onMouseEnter={(e) => onRowEnter(e, f)}
+                    onMouseLeave={clearHover}
+                  >
+                    <FileIcon kind={f.kind} />
+                  </span>
                   <span className="file-name">{f.filename}</span>
                   <FileStatusBadge status={f.status} />
                 </li>
@@ -693,6 +853,90 @@ export function FilingTab() {
           </button>
         </div>
       )}
+
+      {hoverPreview && !modalFileId && (
+        <div
+          className="preview-pop"
+          style={{ top: hoverPreview.top, left: hoverPreview.left }}
+        >
+          <pre className="preview-pop-text">
+            {hoverPreview.text.trim() || "(no extractable text)"}
+            {hoverPreview.truncated ? "\n…" : ""}
+          </pre>
+        </div>
+      )}
+
+      {modalFileId && (
+        <div className="preview-backdrop" onClick={closeModal}>
+          <div
+            className="preview-modal"
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="preview-modal-header">
+              <div className="preview-modal-titles">
+                <span className="preview-modal-name">
+                  {modalFile?.filename ?? modalData?.filename ?? "Preview"}
+                </span>
+                <span className="preview-modal-meta">
+                  {[
+                    modalData?.kind,
+                    modalFile ? formatBytes(modalFile.size_bytes) : null,
+                    modalData?.parser_used,
+                    modalData?.truncated ? "truncated" : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </span>
+              </div>
+              <button
+                className="preview-modal-close"
+                aria-label="Close"
+                onClick={closeModal}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="preview-modal-body">
+              {modalLoading && !modalData ? (
+                <div className="preview-loading">
+                  <span className="spinner" /> Extracting…
+                </div>
+              ) : (
+                <>
+                  {modalData?.kind === "image" && (
+                    <img
+                      className="preview-image"
+                      src={`${BACKEND_URL}/filing/files/${modalFileId}/raw`}
+                      alt={modalData?.filename ?? ""}
+                    />
+                  )}
+                  <pre className="preview-modal-text">
+                    {modalData?.text.trim() || "(no extractable text)"}
+                    {modalData?.truncated ? "\n\n… (truncated)" : ""}
+                  </pre>
+                </>
+              )}
+            </div>
+
+            <div className="preview-modal-footer">
+              {modalFile && (
+                <button
+                  className="preview-btn"
+                  onClick={() => openOriginal(modalFile)}
+                >
+                  Open original
+                </button>
+              )}
+              <button className="preview-btn ghost" onClick={closeModal}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -756,6 +1000,18 @@ function TreeNode({
         ))}
     </>
   );
+}
+
+function formatBytes(n: number): string {
+  if (n < 1024) return `${n} B`;
+  const units = ["KB", "MB", "GB", "TB"];
+  let v = n / 1024;
+  let i = 0;
+  while (v >= 1024 && i < units.length - 1) {
+    v /= 1024;
+    i++;
+  }
+  return `${v.toFixed(v < 10 ? 1 : 0)} ${units[i]}`;
 }
 
 function confLevel(c: number): "high" | "med" | "low" {

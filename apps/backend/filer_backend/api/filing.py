@@ -23,12 +23,14 @@ from typing import Literal
 from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sse_starlette.sse import EventSourceResponse
 
 from filer_backend.filing.fs import FileKind, FsEntry, LIBRARY_ROOT, list_entries
 from filer_backend.filing.tasks import ingest_files_task
+from filer_backend.indexing.extract import extract_text
 from filer_backend.storage.db import get_session
 from filer_backend.storage.models import (
     FilingAction,
@@ -105,6 +107,19 @@ class FiledResult(BaseModel):
     folder_path: str
     status: FileStatus
     moved_to: str
+
+
+class FilePreview(BaseModel):
+    file_id: str
+    filename: str
+    kind: FileKind
+    extension: str | None = None
+    size_bytes: int
+    modified_at: datetime | None = None
+    status: FileStatus
+    parser_used: str | None = None
+    text: str
+    truncated: bool = False
 
 
 # --------------------------------------------------------------------------- #
@@ -431,6 +446,64 @@ def file_into_folder(file_id: str, req: FileIntoFolderRequest) -> FiledResult:
             folder_path=req.folder_path.strip().rstrip("/"),
             status="filed",
             moved_to=moved_to,
+        )
+    finally:
+        s.close()
+
+
+@router.get("/files/{file_id}/preview", response_model=FilePreview)
+def get_preview(file_id: str, limit: int = 600) -> FilePreview:
+    """Extracted-text preview for a file. Served from cached text when available,
+    otherwise extracted on demand (and cached). `limit` caps returned characters."""
+    s = get_session()
+    try:
+        rec = s.get(InboxFile, file_id)
+        if rec is None:
+            raise HTTPException(status_code=404, detail="file not found")
+
+        full = rec.preview_text
+        parser = rec.preview_parser
+        if full is None:
+            # Cache miss (older row or not processed yet); extract once and store.
+            try:
+                full, parser = extract_text(Path(rec.absolute_path))
+            except Exception:  # noqa: BLE001 - preview must not 500 on a bad file
+                full, parser = "", "error"
+            rec.preview_text = full
+            rec.preview_parser = parser
+            s.commit()
+
+        limit = max(0, limit)
+        text = full[:limit]
+        return FilePreview(
+            file_id=rec.id,
+            filename=rec.filename,
+            kind=rec.kind,
+            extension=rec.extension,
+            size_bytes=rec.size_bytes,
+            modified_at=_utc(rec.modified_at),
+            status=rec.status,
+            parser_used=parser,
+            text=text,
+            truncated=len(full) > len(text),
+        )
+    finally:
+        s.close()
+
+
+@router.get("/files/{file_id}/raw")
+def get_raw(file_id: str) -> FileResponse:
+    """Stream the original file bytes (used for inline image rendering)."""
+    s = get_session()
+    try:
+        rec = s.get(InboxFile, file_id)
+        if rec is None:
+            raise HTTPException(status_code=404, detail="file not found")
+        path = Path(rec.absolute_path)
+        if not path.is_file():
+            raise HTTPException(status_code=404, detail="file no longer on disk")
+        return FileResponse(
+            str(path), media_type=rec.mime_type or None, filename=rec.filename
         )
     finally:
         s.close()
