@@ -2,3 +2,4 @@ label,ran_at,profile,llm_model,embedding,n,acc@1,acc@3,mrr,prefix,elapsed_s
 EXP01,2026-06-21T03:58:34.898516+00:00,,gpt-4o-mini,BAAI/bge-small-en-v1.5,50,0.54,0.74,0.6367,0.8853,139.57
 EXP02,2026-06-21T04:40:13.338142+00:00,,qwen2.5:32b,BAAI/bge-small-en-v1.5,50,0.56,0.72,0.6367,0.8785,1495.66
 RANDOM,2026-06-21T04:49:56.413546+00:00,,random@3,none,50,0.0045,0.0135,0.0083,0.7003,0.01
+EXP03,2026-06-22T19:42:29.974238+00:00,,gpt-4o-mini,BAAI/bge-small-en-v1.5,50,0.64,0.82,0.7267,0.9142,195.0
