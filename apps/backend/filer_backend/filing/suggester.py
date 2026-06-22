@@ -116,13 +116,15 @@ def suggest_folders(
     exclude_file_ids=(),
     settings: Settings | None = None,
     agent=None,
+    text: str | None = None,
 ) -> list[Suggestion]:
     settings = settings or get_settings()
     path = Path(inbox_file.absolute_path)
-    try:
-        text, _ = extract_text(path)
-    except Exception:  # noqa: BLE001
-        text = ""
+    if text is None:  # caller may pass already-extracted text to avoid re-reading
+        try:
+            text, _ = extract_text(path)
+        except Exception:  # noqa: BLE001
+            text = ""
 
     query = (text or inbox_file.filename)[:4000]
     emb = get_embedder()

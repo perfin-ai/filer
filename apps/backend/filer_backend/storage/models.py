@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Boolean, DateTime, Float, Integer, String
+from sqlalchemy import BigInteger, Boolean, DateTime, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from filer_backend.storage.db import Base
@@ -88,6 +88,9 @@ class InboxFile(Base):
     added_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     processed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     filed_to: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Extracted text cached at ingest, reused for the content-preview UI.
+    preview_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    preview_parser: Mapped[str | None] = mapped_column(String, nullable=True)
 
 
 class FilingSuggestion(Base):

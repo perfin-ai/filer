@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 
 from filer_backend.filing.fs import kind_for
 from filer_backend.filing.suggester import suggest_folders
+from filer_backend.indexing.extract import extract_text
 from filer_backend.indexing.walker import hash_file, iter_files
 from filer_backend.storage.db import get_session
 from filer_backend.storage.models import FilingBatch, FilingSuggestion, InboxFile
@@ -24,6 +25,9 @@ log = logging.getLogger(__name__)
 
 # An inbox row at one of these statuses already represents the path; skip re-adding.
 _ACTIVE = ("queued", "processing", "ready")
+
+# Cap cached preview text; enough to fill the preview modal without bloating the DB.
+PREVIEW_CHARS = 20_000
 
 
 def _now() -> datetime:
@@ -63,7 +67,15 @@ def _process_one(s: Session, file_id: str) -> None:
     s.commit()
 
     rec.content_hash = hash_file(Path(rec.absolute_path))
-    for rank, sug in enumerate(suggest_folders(rec)):
+    # Extract once here, cache it for the preview UI, and reuse it for suggestions
+    # so we don't read (and possibly OCR) the file twice.
+    try:
+        text, parser = extract_text(Path(rec.absolute_path))
+    except Exception:  # noqa: BLE001 - extraction failure shouldn't block filing
+        text, parser = "", "error"
+    rec.preview_text = text[:PREVIEW_CHARS]
+    rec.preview_parser = parser
+    for rank, sug in enumerate(suggest_folders(rec, text=text)):
         s.add(
             FilingSuggestion(
                 id=uuid4().hex,
